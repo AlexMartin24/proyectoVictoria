@@ -4,9 +4,10 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { Router } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
 import { MatDialogModule } from '@angular/material/dialog';
-import { AuthService } from '../../service/auth.service';
 import { UserCredentials } from '../../../features/Users/model/user.model';
 import { RegisterDialogComponent } from '../register-dialog/register-dialog.component';
+import { ResetPasswordDialogComponent } from '../reset-password-dialog/reset-password-dialog.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-dialog',
@@ -73,6 +74,19 @@ export class LoginDialogComponent {
       console.log('El registro fue cerrado', result);
     });
   }
+
+  openResetDialog() {
+  this.dialogRef.close(); // opcional: cerrar login si querés
+  const dialogRef = this.dialog.open(ResetPasswordDialogComponent, {
+    disableClose: true,
+    // data si necesitás pasar algo
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    // opcional: si result === true mostrar algo
+  });
+}
+
 
   closeDialog() {
     this.dialogRef.close();

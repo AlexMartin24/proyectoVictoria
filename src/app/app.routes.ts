@@ -3,8 +3,6 @@ import { Routes } from '@angular/router';
 import { FormComponent } from './auth/form/form.component';
 import { IndexComponent } from './core/components/index/index.component';
 import { ListUserComponent } from './features/Users/list-user/list-user.component';
-import { ResourcesComponent } from './features/Resources/resources/resources.component';
-import { ListSchoolsComponent } from './features/Schools/list-schools/list-schools.component';
 
 export const routes: Routes = [
 

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../../auth/service/auth.service';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { SharedModule } from '../../../shared/shared.module';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginDialogComponent } from '../../../auth/components/login-dialog/login-dialog.component';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-navbar',

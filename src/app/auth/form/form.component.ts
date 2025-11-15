@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { AuthService } from '../service/auth.service';
 import { SharedModule } from '../../shared/shared.module';
 import { MatDividerModule } from '@angular/material/divider';
 import { Router } from '@angular/router';
 import { regexNumeros, regexTextos } from '../../shared/pattern/patterns';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-form',

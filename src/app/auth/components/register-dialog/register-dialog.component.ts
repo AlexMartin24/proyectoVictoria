@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
-import { AuthService } from '../../service/auth.service';
 import { regexMail, regexPassword } from '../../../shared/pattern/patterns';
 import { validatePassword } from '../../passwordValidator';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register-dialog',

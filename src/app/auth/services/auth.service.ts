@@ -9,6 +9,7 @@ import {
 } from '@angular/fire/auth';
 import {
   GoogleAuthProvider,
+  sendPasswordResetEmail,
   setPersistence,
   signInWithPopup,
 } from 'firebase/auth';
@@ -101,37 +102,26 @@ export class AuthService {
   // ----------------------------------------------------------------------
   // REGISTER EMAIL/PASSWORD
   // ----------------------------------------------------------------------
-  async registrarUsuario({ email, password }: UserCredentials) {
-    if (!this.validateEmail(email)) {
-      throw new Error('Formato de correo inválido.');
-    }
-    if (!this.validatePassword(password)) {
-      throw new Error('La contraseña debe tener al menos 6 caracteres.');
-    }
+  async registrarUsuario({ name, lastname, email, password }: any) {
+    const cred = await createUserWithEmailAndPassword(
+      this.auth,
+      email,
+      password
+    );
+    const user = cred.user;
 
-    try {
-      const cred = await createUserWithEmailAndPassword(
-        this.auth,
-        email,
-        password
-      );
+    await this.saveUser(user.uid, {
+      uid: user.uid,
+      email,
+      name,
+      lastname,
+      role: 'usuario',
+      enabled: true,
+      createdAt: new Date().toISOString(),
+    });
 
-      const user = cred.user;
-
-      await this.saveUser(user.uid, {
-        uid: user.uid,
-        email: user.email ?? '',
-        role: 'usuario',
-        enabled: true,
-        createdAt: new Date().toISOString(),
-      });
-
-      return user.uid;
-    } catch (error) {
-      this.handleError(error);
-    }
+    return user.uid;
   }
-
   // ----------------------------------------------------------------------
   // GET CURRENT USER
   // ----------------------------------------------------------------------
@@ -156,6 +146,19 @@ export class AuthService {
     await signOut(this.auth);
     this.isLoggedInSubject.next(false);
     this.currentUserSubject.next(null);
+  }
+
+/** ----------------------------------------------------------------------
+ * RESET CONTRASEÑA
+ * Envía email con link de recuperación (Firebase)
+ * ---------------------------------------------------------------------- */
+  async sendPasswordReset(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error: any) {
+      console.error('Error al enviar email de reset:', error);
+      throw new Error('No pudimos enviar el email. Revisá que el correo esté registrado.');
+    }
   }
 
   // ----------------------------------------------------------------------
