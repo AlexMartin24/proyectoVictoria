@@ -5,22 +5,21 @@ import { SharedModule } from '../../shared/shared.module';
 import { MatDividerModule } from '@angular/material/divider';
 import { Router } from '@angular/router';
 import { regexNumeros, regexTextos } from '../../shared/pattern/patterns';
-import { User } from '../usuario.model';
 
 @Component({
   selector: 'app-form',
   standalone: true,
-  imports: [SharedModule, MatDividerModule],
+  imports: [SharedModule],
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.css'],
 })
 export class FormComponent implements OnInit {
-  primerFormUsuario: FormGroup;
-  segundoFormUsuario: FormGroup;
+  firstUserForm: FormGroup;
+  secondUserForm: FormGroup;
   isLinear = true;
 
   constructor(private authService: AuthService, private router: Router) {
-    this.primerFormUsuario = new FormGroup({
+    this.firstUserForm = new FormGroup({
       name: new FormControl('', [
         Validators.required,
         Validators.pattern(regexTextos),
@@ -38,7 +37,7 @@ export class FormComponent implements OnInit {
       ]),
     });
 
-    this.segundoFormUsuario = new FormGroup({
+    this.secondUserForm = new FormGroup({
       address: new FormControl('', [Validators.maxLength(50)]),
       birthdate: new FormControl(''),
       phone: new FormControl('', [
@@ -49,22 +48,22 @@ export class FormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.cargarDatosUsuario();
+    this.loadUserData();
   }
 
-  async cargarDatosUsuario() {
-    const userId = this.authService.obtenerIDUsuario();
+  async loadUserData() {
+    const userId = this.authService.getUserID();
     if (userId) {
       try {
-        const userData = await this.authService.obtenerDatosUsuario(userId);
+        const userData = await this.authService.getUserData(userId);
         if (userData) {
-          this.primerFormUsuario.patchValue({
+          this.firstUserForm.patchValue({
             name: userData.name,
             lastname: userData.lastname,
             role: userData.role,
           });
 
-          this.segundoFormUsuario.patchValue({
+          this.secondUserForm.patchValue({
             address: userData.address,
             birthdate: userData.birthdate,
             phone: userData.phone,
@@ -76,18 +75,18 @@ export class FormComponent implements OnInit {
     }
   }
 
-  enviarForm() {
-    if (this.primerFormUsuario.invalid || this.segundoFormUsuario.invalid) {
+  submitForm() {
+    if (this.firstUserForm.invalid || this.secondUserForm.invalid) {
       console.error('Formulario inválido');
       return;
     }
 
     const nuevoUsuario = {
-      ...this.primerFormUsuario.value,
-      ...this.segundoFormUsuario.value,
+      ...this.firstUserForm.value,
+      ...this.secondUserForm.value,
     };
 
-    const userId = this.authService.obtenerIDUsuario();
+    const userId = this.authService.getUserID();
     if (!userId) {
       console.error('No hay usuario autenticado. Iniciar sesión');
       this.router.navigate(['/auth/iniciar-sesion/']);
@@ -95,10 +94,10 @@ export class FormComponent implements OnInit {
     }
 
     this.authService
-      .agregarDatosUsuario(userId, nuevoUsuario)
+      .addUserData(userId, nuevoUsuario)
       .then(() => {
         console.log('Datos guardados correctamente');
-        this.router.navigate(['/cursos/']);
+        this.router.navigate(['/']);
       })
       .catch((error) => {
         console.error('Error guardando datos: ', error, nuevoUsuario);

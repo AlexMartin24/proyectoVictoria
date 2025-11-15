@@ -43,21 +43,21 @@ export class LoginDialogComponent {
         if (response.newUser) {
           this.router.navigate(['/form']); // Redirigir al formulario
         } else {
-          this.router.navigate(['/cursos']); // Redirigir a la página de cursos
+          this.router.navigate(['/']); // Redirigir a la página de inicio
         }
         this.dialogRef.close();
       })
       .catch(error => console.log(error));
   }
 
-  enviarForm() {
+  sendForm() {
     console.log(this.loginUser.value);
     this.authService.login(this.loginUser.value)
       .then(() => {
         // Cierra el diálogo
         this.dialogRef.close();
         // Redirige a otra página
-        this.router.navigate(['/cursos']);
+        this.router.navigate(['/']);
       })
       .catch(error => console.log(error));
   }

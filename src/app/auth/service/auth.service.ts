@@ -8,7 +8,11 @@ import {
   browserLocalPersistence,
 } from '@angular/fire/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
-import { GoogleAuthProvider, setPersistence, signInWithPopup } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  setPersistence,
+  signInWithPopup,
+} from 'firebase/auth';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { regexMail } from '../../shared/pattern/patterns';
 import { FirebaseError } from 'firebase/app';
@@ -25,7 +29,7 @@ export class AuthService {
   constructor(
     private auth: Auth,
     private firestore: Firestore,
-    private errorHandler: ErrorHandlerService,
+    private errorHandler: ErrorHandlerService
   ) {
     // Establecer persistencia a session
     setPersistence(this.auth, browserLocalPersistence)
@@ -43,13 +47,13 @@ export class AuthService {
         const docSnap = await getDoc(doc(this.firestore, `users/${user.uid}`));
         if (docSnap.exists()) {
           const usuarioFirestore = docSnap.data() as User;
-          this.usuarioActualSubject.next(usuarioFirestore);
+          this.currentUserSubject.next(usuarioFirestore);
         } else {
-          this.usuarioActualSubject.next(null);
+          this.currentUserSubject.next(null);
         }
       } else {
         console.log('No hay usuario autenticado');
-        this.usuarioActualSubject.next(null);
+        this.currentUserSubject.next(null);
       }
     });
   }
@@ -72,7 +76,10 @@ export class AuthService {
   }
 
   async registerWithGoogle() {
-    const userCredential = await signInWithPopup(this.auth, new GoogleAuthProvider());
+    const userCredential = await signInWithPopup(
+      this.auth,
+      new GoogleAuthProvider()
+    );
     const user = userCredential.user;
 
     const userRef = doc(this.firestore, `users/${user.uid}`);
@@ -95,7 +102,6 @@ export class AuthService {
     }
   }
 
-
   async logout() {
     await signOut(this.auth);
     this.isLoggedInSubject.next(false);
@@ -103,10 +109,10 @@ export class AuthService {
 
   async registrarUsuario(credenciales: UserCredentials) {
     // Validaciones
-    if (!this.validarMail(credenciales.email)) {
+    if (!this.validateEmail(credenciales.email)) {
       throw new Error('Formato de correo inválido.');
     }
-    if (!this.validarContasena(credenciales.password)) {
+    if (!this.validatePassword(credenciales.password)) {
       throw new Error('La contraseña debe tener al menos 6 caracteres.');
     }
 
@@ -128,7 +134,7 @@ export class AuthService {
     return user.uid; // Devolver el ID del usuario para usarlo más tarde
   }
 
-  async obtenerDatosUsuario(userId: string): Promise<User | null> {
+  async getUserData(userId: string): Promise<User | null> {
     const userRef = doc(this.firestore, `users/${userId}`);
     const docSnap = await getDoc(userRef);
     if (docSnap.exists()) {
@@ -138,42 +144,27 @@ export class AuthService {
     }
   }
 
-
-
-
-  async agregarDatosUsuario(userId: string, userData: User) {
+  async addUserData(userId: string, userData: User) {
     const userRef = doc(this.firestore, `users/${userId}`);
     // merge: true para no sobrescribir el email si ya existe
     return setDoc(userRef, userData, { merge: true });
   }
 
-
-  private validarContasena(password: string): boolean {
+  private validatePassword(password: string): boolean {
     return password.length >= 6;
   }
 
-  private validarMail(email: string): boolean {
+  private validateEmail(email: string): boolean {
     const regex = new RegExp(regexMail);
     return regex.test(email);
   }
 
-  obtenerIDUsuario(): string | null {
+  getUserID(): string | null {
     const user = this.auth.currentUser;
     console.log(user);
     return user ? user.uid : null;
   }
 
-  private usuarioActualSubject = new BehaviorSubject<User | null>(null);
-  usuarioActual$ = this.usuarioActualSubject.asObservable();
-
-
-  getEscuelaId(): string | null {
-    return this.usuarioActualSubject.value?.schoolId || null;
-  }
-
-  getRolUsuario(): string | null {
-    return this.usuarioActualSubject.value?.role || null;
-  }
-
-
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
 }

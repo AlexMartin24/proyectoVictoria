@@ -8,7 +8,7 @@
             <img class="mb-4" src="https://avellaneda.ibeltran.com.ar/img/logo/logo.png" alt="Logo" />
             <h1 mat-dialog-title>Iniciar Sesión</h1>
 
-            <form [formGroup]="loginUser" class="input-group-sm mb-4" (ngSubmit)="enviarForm()">
+            <form [formGroup]="loginUser" class="input-group-sm mb-4" (ngSubmit)="sendForm()">
 
                 <div class="form-floating mb-4">
                     <input type="email" class="form-control" id="user-email" formControlName="email"

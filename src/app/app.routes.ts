@@ -1,10 +1,4 @@
 import { Routes } from '@angular/router';
-import { ListarProfesorComponent } from './features/Profesor/listar-profesor/listar-profesor.component';
-import { PerfilProfesorComponent } from './features/Profesor/perfil-profesor/perfil-profesor.component';
-import { ListarCursosComponent } from './features/Cursos/listar-cursos/listar-cursos.component';
-import { ListarAlumnosComponent } from './features/Alumnos/listar-alumnos/listar-alumnos.component';
-import { PerfilAlumnoComponent } from './features/Alumnos/perfil-alumno/perfil-alumno.component';
-import { CursoComponent } from './features/Cursos/curso/curso.component';
 // import { LoginComponent } from './auth/login/login.component';
 import { FormComponent } from './auth/form/form.component';
 import { IndexComponent } from './core/components/index/index.component';
@@ -13,26 +7,24 @@ import { ResourcesComponent } from './features/Resources/resources/resources.com
 import { ListSchoolsComponent } from './features/Schools/list-schools/list-schools.component';
 
 export const routes: Routes = [
-  { path: 'profesores', component: ListarProfesorComponent },
-  { path: 'profesor/:idProfesor', component: PerfilProfesorComponent },
-
-  { path: 'cursos', component: ListarCursosComponent },
-  { path: 'curso/:idCurso', component: CursoComponent },
-
-  { path: 'alumnos', component: ListarAlumnosComponent },
-  { path: 'alumno/:idAlumno', component: PerfilAlumnoComponent },
 
   { path: 'form', component: FormComponent },
 
   // { path: '', component: IndexComponent },
-  // { path: '', component: ListUserComponent },
+  { path: '', component: ListUserComponent },
 
   // { path: '', component: ResourcesComponent },
 
-  { path: '', component: ListSchoolsComponent },
+  // { path: '', component: ListSchoolsComponent },
 
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
+
+    {
+    path: 'users',
+    loadChildren: () => import('./features/Users/user.routes').then((m) => m.USER_ROUTES),
+  },
+
 ];

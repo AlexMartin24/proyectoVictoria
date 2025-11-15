@@ -13,24 +13,24 @@
     {{!isLinear ? 'Completar Formulario' : 'Disable linear mode'}}
   </button> -->
   <mat-stepper orientation="vertical" [linear]="isLinear" #stepper>
-    <!-- Primer Form: Datos Personales -->
-    <mat-step [stepControl]="primerFormUsuario">
-      <form [formGroup]="primerFormUsuario">
-        <ng-template matStepLabel>Datos Personales</ng-template>
+    <!-- Primer Form: Datos Obligatorios -->
+    <mat-step [stepControl]="firstUserForm">
+      <form [formGroup]="firstUserForm">
+        <ng-template matStepLabel>Datos Obligatorios</ng-template>
 
         <mat-form-field appearance="fill">
           <mat-label>Nombre</mat-label>
           <input matInput formControlName="name" placeholder="Ingrese su nombre" />
           <mat-error
-            *ngIf="primerFormUsuario.controls['name'].hasError('required') && primerFormUsuario.controls['name'].dirty">
+            *ngIf="firstUserForm.controls['name'].hasError('required') && firstUserForm.controls['name'].dirty">
             Campo obligatorio.
           </mat-error>
           <mat-error
-            *ngIf="primerFormUsuario.controls['name'].hasError('maxlength') && primerFormUsuario.controls['name'].dirty">
+            *ngIf="firstUserForm.controls['name'].hasError('maxlength') && firstUserForm.controls['name'].dirty">
             Superaste los caracteres disponibles.
           </mat-error>
           <mat-error
-            *ngIf="primerFormUsuario.controls['name'].hasError('pattern') && primerFormUsuario.controls['name'].dirty">
+            *ngIf="firstUserForm.controls['name'].hasError('pattern') && firstUserForm.controls['name'].dirty">
             Caracteres invalido.
           </mat-error>
         </mat-form-field>
@@ -39,15 +39,15 @@
           <mat-label>Apellido</mat-label>
           <input matInput formControlName="lastname" placeholder="Ingrese su apellido" />
           <mat-error
-            *ngIf="primerFormUsuario.controls['lastname'].hasError('required') && primerFormUsuario.controls['lastname'].dirty">
+            *ngIf="firstUserForm.controls['lastname'].hasError('required') && firstUserForm.controls['lastname'].dirty">
             Campo obligatorio.
           </mat-error>
           <mat-error
-            *ngIf="primerFormUsuario.controls['lastname'].hasError('maxlength') && primerFormUsuario.controls['lastname'].dirty">
+            *ngIf="firstUserForm.controls['lastname'].hasError('maxlength') && firstUserForm.controls['lastname'].dirty">
             Superaste los caracteres disponibles.
           </mat-error>
           <mat-error
-            *ngIf="primerFormUsuario.controls['lastname'].hasError('pattern') && primerFormUsuario.controls['lastname'].dirty">
+            *ngIf="firstUserForm.controls['lastname'].hasError('pattern') && firstUserForm.controls['lastname'].dirty">
             Caracteres invalido.
           </mat-error>
         </mat-form-field>
@@ -55,11 +55,11 @@
         <mat-form-field appearance="fill">
           <mat-label>Tipo de Usuario</mat-label>
           <mat-select formControlName="role">
-            <mat-option value="DOCENTE">Docente</mat-option>
-            <mat-option value="ADMINISTRADOR">Administrador</mat-option>
+            <mat-option value="Usuario">Usuario</mat-option>
+            <mat-option value="Administrador">Administrador</mat-option>
           </mat-select>
           <mat-error
-            *ngIf="primerFormUsuario.controls['role'].hasError('required') && primerFormUsuario.controls['role'].dirty">
+            *ngIf="firstUserForm.controls['role'].hasError('required') && firstUserForm.controls['role'].dirty">
             Campo obligatorio.
           </mat-error>
         </mat-form-field>
@@ -75,19 +75,19 @@
     </mat-step>
 
     <!-- Segundo Form: Datos Complementarios -->
-    <mat-step [stepControl]="segundoFormUsuario">
-      <form [formGroup]="segundoFormUsuario">
+    <mat-step [stepControl]="secondUserForm">
+      <form [formGroup]="secondUserForm">
         <ng-template matStepLabel>Datos Complementarios</ng-template>
 
         <mat-form-field appearance="fill">
           <mat-label>Dirección</mat-label>
           <input matInput formControlName="address" placeholder="Ingrese su dirección" />
           <mat-error
-            *ngIf="segundoFormUsuario.controls['address'].hasError('maxlength') && segundoFormUsuario.controls['address'].dirty">
+            *ngIf="secondUserForm.controls['address'].hasError('maxlength') && secondUserForm.controls['address'].dirty">
             Superaste los caracteres disponibles.
           </mat-error>
           <mat-error
-            *ngIf="segundoFormUsuario.controls['address'].hasError('pattern') && segundoFormUsuario.controls['address'].dirty">
+            *ngIf="secondUserForm.controls['address'].hasError('pattern') && secondUserForm.controls['address'].dirty">
             Caracteres invalido.
           </mat-error>
 
@@ -105,11 +105,11 @@
           <mat-label>Teléfono</mat-label>
           <input matInput formControlName="phone" placeholder="Ingrese su teléfono" />
           <mat-error
-            *ngIf="segundoFormUsuario.controls['phone'].hasError('maxlength') && segundoFormUsuario.controls['phone'].dirty">
+            *ngIf="secondUserForm.controls['phone'].hasError('maxlength') && secondUserForm.controls['phone'].dirty">
             Superaste los caracteres disponibles.
           </mat-error>
           <mat-error
-            *ngIf="segundoFormUsuario.controls['phone'].hasError('pattern') && segundoFormUsuario.controls['phone'].dirty">
+            *ngIf="secondUserForm.controls['phone'].hasError('pattern') && secondUserForm.controls['phone'].dirty">
             Caracter invalido.
           </mat-error>
 
@@ -128,8 +128,8 @@
       <div>
         <button mat-button matStepperPrevious>Regresar</button>
         <!-- <button mat-button (click)="stepper.reset()">Reset</button> -->
-        <button mat-raised-button color="primary" type="button" (click)="enviarForm()"
-          [disabled]="primerFormUsuario.invalid || segundoFormUsuario.invalid">
+        <button mat-raised-button color="primary" type="button" (click)="submitForm()"
+          [disabled]="firstUserForm.invalid || secondUserForm.invalid">
           Enviar Formulario
         </button>
       </div>
