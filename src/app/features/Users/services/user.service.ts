@@ -47,7 +47,7 @@ export class UserService {
             }
 
             return {
-              userId: doc.id,
+              uid: doc.id,
               ...jsonUser,
             } as User;
           });
@@ -82,7 +82,6 @@ export class UserService {
         phone: newUser.phone,
         role: newUser.role,
         birthdate: newUser.birthdate,
-        schoolId: newUser.schoolId || 'Sin asignar',
         enabled: newUser.enabled,
         createdAt: new Date().toISOString(),
       });
@@ -100,16 +99,16 @@ export class UserService {
   // El Admin crea la ficha en Firestore (no en Auth).
 async preloadUser(newUser: NewUser): Promise<string> {
   const userRef = doc(collection(this.firestore, 'users'));
-  const userId = userRef.id;
+  const uid = userRef.id;
 
   await setDoc(userRef, {
-    userId,
+    uid,
     ...newUser,
     enabled: false,
     createdAt: new Date().toISOString(),
   });
 
-  return userId;
+  return uid;
 }
 
 async createUserAsAdmin(newUser: NewUser, password: string): Promise<void> {
@@ -128,7 +127,7 @@ async createUserAsAdmin(newUser: NewUser, password: string): Promise<void> {
   // 3️⃣ Guardar ficha en Firestore con el UID
   const userRef = doc(this.firestore, `users/${uid}`);
   await setDoc(userRef, {
-    userId: uid,
+    uid: uid,
     ...newUser,
     enabled: false, // hasta que confirme el mail
     createdAt: new Date().toISOString(),
@@ -139,9 +138,9 @@ async createUserAsAdmin(newUser: NewUser, password: string): Promise<void> {
 
   // -----------------
 
-  async updateUserData(userId: string, editUser: Partial<User>): Promise<void> {
-    const userRef = doc(this.firestore, `users/${userId}`);
-    // console.log('ID del usuario:', userId);
+  async updateUserData(uid: string, editUser: Partial<User>): Promise<void> {
+    const userRef = doc(this.firestore, `users/${uid}`);
+    // console.log('ID del usuario:', uid);
     await updateDoc(userRef, editUser);
   }
 

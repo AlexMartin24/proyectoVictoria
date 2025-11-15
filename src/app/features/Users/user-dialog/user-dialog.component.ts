@@ -47,7 +47,6 @@ this.editForm = new FormGroup({
   role: new FormControl(user.role, [Validators.required, Validators.pattern(regexTextos)]),
   address: new FormControl(user.address ?? '', [Validators.pattern(regexDireccion)]),
   phone: new FormControl(user.phone ?? '', [Validators.pattern(regexNumeros)]),
-  schoolId: new FormControl(user.schoolId ?? '', [Validators.pattern(regexTextos)]),
 });
 
 
@@ -59,7 +58,7 @@ aceptar() {
 
     this.dialogRef.close({
       ...formData,
-      userId: this.data.user.userId,
+      uid: this.data.user.uid,
     });
   } else {
     this.editForm.markAllAsTouched();

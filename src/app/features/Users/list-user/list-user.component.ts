@@ -93,7 +93,6 @@ addUser() {
         birthdate: result.birthdate || new Date(),
         address: result.address || '',
         phone: result.phone || '',
-        schoolId: result.schoolId || 'Sin asignar',
         role: result.role || '',
         enabled: false,
         createdAt: new Date().toISOString(),
@@ -117,7 +116,7 @@ addUser() {
 }
 
   editUser(user: User) {
-    if (!user.userId) {
+    if (!user.uid) {
       this.dialogService.errorDialog(
         'Error',
         'No se puede editar un usuario sin ID.'
@@ -130,7 +129,7 @@ addUser() {
       .subscribe(async (result) => {
         if (result) {
           try {
-            await this.usersService.updateUserData(user.userId, result);
+            await this.usersService.updateUserData(user.uid, result);
             this.dialogService.infoDialog(
               'Éxito',
               'Datos editados correctamente.'
@@ -146,7 +145,7 @@ addUser() {
   }
 
   disableUser(user: User) {
-    if (!user.userId) {
+    if (!user.uid) {
       console.error('ID del user es indefinido');
       return;
     }
@@ -158,7 +157,7 @@ addUser() {
       })
       .subscribe(async (result) => {
         if (result) {
-          await this.usersService.disableUser(user.userId);
+          await this.usersService.disableUser(user.uid);
           this.dialogService.infoDialog(
             'Éxito',
             'El usuario ha sido eliminado correctamente.'
@@ -173,7 +172,7 @@ addUser() {
   }
 
   enableUser(user: User) {
-    if (!user.userId) {
+    if (!user.uid) {
       console.error('ID del user es indefinido');
       return;
     }
@@ -185,7 +184,7 @@ addUser() {
       })
       .subscribe(async (result) => {
         if (result) {
-          await this.usersService.enableUser(user.userId);
+          await this.usersService.enableUser(user.uid);
           this.dialogService.infoDialog(
             'Éxito',
             'El usuario ha sido dado de alta correctamente.'

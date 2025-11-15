@@ -13,7 +13,7 @@ import { RegisterDialogComponent } from '../register-dialog/register-dialog.comp
   standalone: true,
   imports: [SharedModule, MatDialogModule],
   templateUrl: './login-dialog.component.html',
-  styleUrl: './login-dialog.component.css'
+  styleUrls: ['./login-dialog.component.css']
 })
 export class LoginDialogComponent {
   loginUser!: FormGroup;
@@ -40,7 +40,7 @@ export class LoginDialogComponent {
   loginGoogle() {
     this.authService.loginWithGoogle()
       .then(response => {
-        if (response.newUser) {
+        if ('newUser' in response && (response as any).newUser) {
           this.router.navigate(['/form']); // Redirigir al formulario
         } else {
           this.router.navigate(['/']); // Redirigir a la página de inicio

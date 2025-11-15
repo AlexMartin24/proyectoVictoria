@@ -1,37 +1,31 @@
-
 export interface UserCredentials {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface User {
-    userId: string;
-    address: string;
-    email: string;
-    lastname: string;
-    name: string;
-    phone: string;
-    role: 'DOCENTE' | 'ADMINISTRADOR';
-    birthdate: Date;
-    schoolId: string;
-
-    photoURL?: string;
-    enabled: boolean;
-    createdAt: string;
-
+  uid: string;
+  email: string;
+  name?: string;
+  lastname?: string;
+  role: 'usuario' | 'admin';
+  address?: string;
+  birthdate?: string;
+  phone?: string;
+  photoURL?: string;
+  enabled: boolean;
+  createdAt: string;
 }
 
 export interface NewUser {
-    address: string;
-    email: string;
-    lastname: string;
-    name: string;
-    phone: string;
-    role: string;
-    birthdate: Date;
-    schoolId: string;
-
-    photoURL?: string;
-    enabled: boolean;
-    createdAt: string;
+  email: string;
+  name?: string;
+  lastname?: string;
+  role: 'usuario' | 'admin';
+  address?: string;
+  birthdate?: string;
+  phone?: string;
+  photoURL?: string;
+  enabled: boolean;
+  createdAt: string;
 }

@@ -12,19 +12,26 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
   standalone: true,
   imports: [SharedModule],
   templateUrl: './register-dialog.component.html',
-  styleUrl: './register-dialog.component.css'
+  styleUrl: './register-dialog.component.css',
 })
 export class RegisterDialogComponent {
-
   userForm!: FormGroup;
 
   constructor(
     private dialogRef: MatDialogRef<RegisterDialogComponent>,
     private dialog: MatDialog,
     private authService: AuthService,
-    private router: Router,
+    private router: Router
   ) {
     this.userForm = new FormGroup({
+      name: new FormControl('', [
+        Validators.required,
+        Validators.maxLength(30),
+      ]),
+      lastname: new FormControl('', [
+        Validators.required,
+        Validators.maxLength(30),
+      ]),
       email: new FormControl('', [
         Validators.required,
         Validators.pattern(regexMail),
@@ -33,7 +40,7 @@ export class RegisterDialogComponent {
       password: new FormControl('', [
         Validators.required,
         Validators.required,
-        validatePassword
+        validatePassword,
       ]),
     });
   }
@@ -62,7 +69,4 @@ export class RegisterDialogComponent {
     this.dialogRef.close();
     // console.log("asd");
   }
-
-
 }
-

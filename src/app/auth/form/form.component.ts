@@ -52,10 +52,10 @@ export class FormComponent implements OnInit {
   }
 
   async loadUserData() {
-    const userId = this.authService.getUserID();
-    if (userId) {
+    const uid = this.authService.getUserID();
+    if (uid) {
       try {
-        const userData = await this.authService.getUserData(userId);
+        const userData = await this.authService.getUserData(uid);
         if (userData) {
           this.firstUserForm.patchValue({
             name: userData.name,
@@ -86,15 +86,15 @@ export class FormComponent implements OnInit {
       ...this.secondUserForm.value,
     };
 
-    const userId = this.authService.getUserID();
-    if (!userId) {
+    const uid = this.authService.getUserID();
+    if (!uid) {
       console.error('No hay usuario autenticado. Iniciar sesión');
       this.router.navigate(['/auth/iniciar-sesion/']);
       return;
     }
 
     this.authService
-      .addUserData(userId, nuevoUsuario)
+      .saveUser(uid, nuevoUsuario)
       .then(() => {
         console.log('Datos guardados correctamente');
         this.router.navigate(['/']);

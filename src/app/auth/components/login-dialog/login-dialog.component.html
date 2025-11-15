@@ -1,48 +1,67 @@
 <div mat-dialog-content class="medidas-dialog">
-    <button class="close-button" mat-icon-button (click)="closeDialog()">
-        <mat-icon>close</mat-icon>
-    </button>
+  <button class="close-button" mat-icon-button (click)="closeDialog()">
+    <mat-icon>close</mat-icon>
+  </button>
 
-    <div class="text-center">
-        <main class="form-signin">
-            <img class="mb-4" src="https://avellaneda.ibeltran.com.ar/img/logo/logo.png" alt="Logo" />
-            <h1 mat-dialog-title>Iniciar Sesión</h1>
+  <div class="text-center form-wrapper">
+    <img
+      class="logo mb-4"
+      src="https://avellaneda.ibeltran.com.ar/img/logo/logo.png"
+      alt="Logo"
+    />
 
-            <form [formGroup]="loginUser" class="input-group-sm mb-4" (ngSubmit)="sendForm()">
+    <h2 class="title">Iniciar Sesión</h2>
+    <p class="subtitle">Ingresá tus datos para continuar</p>
 
-                <div class="form-floating mb-4">
-                    <input type="email" class="form-control" id="user-email" formControlName="email"
-                        placeholder="email@example.com" autofocus />
+    <form [formGroup]="loginUser" (ngSubmit)="sendForm()">
+      <mat-form-field appearance="fill" class="w100">
+        <mat-label>Correo Electrónico</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          placeholder="email@example.com"
+        />
+      </mat-form-field>
 
-                    <label for="user-email"> Correo Electronico</label>
-                </div>
+      <mat-form-field appearance="fill" class="w100">
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          type="password"
+          formControlName="password"
+          placeholder="Escriba su contraseña"
+        />
+      </mat-form-field>
 
-                <div class="form-floating mb-4">
-                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                        formControlName="password" />
-                    <label for="floatingPassword"> Contraseña</label>
-                </div>
+      <button class="btn-primary-main" type="submit">Ingresar</button>
 
-                <button mat-raised-button color="primary" class="w-100" type="submit">
-                    Ingresar
-                </button>
+      <hr class="divider" />
 
-                <hr class="dropdown-divider" />
+      <button
+        mat-stroked-button
+        color="accent"
+        class="btn-google"
+        type="button"
+        (click)="loginGoogle()"
+      >
+        <img
+          src="assets/img/logo-google.png"
+          alt="Google"
+          class="google-logo"
+        />
+        Ingresar con Google
+      </button>
 
-                <button mat-stroked-button color="accent" class="google-button" type="button" (click)="loginGoogle()">
-                    <img src="assets/img/logo-google.png" alt="Google logo" class="google-logo"
-                        style="height: 20px; margin-right: 8px;">
-                    Ingresar con Google
-                </button>
-
-                <button mat-button color="warn" class="w-100 mt-2" type="button" (click)="registerDialog()">
-                    Registrarse
-                </button>
-
-
-
-            </form>
-        </main>
-    </div>
-
+      <button
+        mat-button
+        color="warn"
+        class="btn-secondary"
+        type="button"
+        (click)="registerDialog()"
+      >
+        Registrarse
+      </button>
+    </form>
+  </div>
 </div>
