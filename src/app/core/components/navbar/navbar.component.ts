@@ -47,7 +47,7 @@ export class NavbarComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('El diálogo fue cerrado', result);
+      // console.log('El diálogo fue cerrado', result);
     });
   }
 

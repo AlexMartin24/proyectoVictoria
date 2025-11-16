@@ -2,62 +2,39 @@ import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
-import { regexMail, regexPassword } from '../../../shared/pattern/patterns';
+import { regexMail } from '../../../shared/pattern/patterns';
 import { validatePassword } from '../../passwordValidator';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
+import { DialogService } from '../../../core/services/dialog.service';
 
 @Component({
   selector: 'app-register-dialog',
   standalone: true,
   imports: [SharedModule],
   templateUrl: './register-dialog.component.html',
-  styleUrl: './register-dialog.component.css',
+  styleUrls: ['./register-dialog.component.css'],
 })
 export class RegisterDialogComponent {
-  userForm!: FormGroup;
+  userForm: FormGroup;
+  loading = false;
 
   constructor(
     private dialogRef: MatDialogRef<RegisterDialogComponent>,
-    private dialog: MatDialog,
     private authService: AuthService,
+    private dialogService: DialogService,
     private router: Router
   ) {
     this.userForm = new FormGroup({
-      name: new FormControl('', [
-        Validators.required,
-        Validators.maxLength(30),
-      ]),
-      lastname: new FormControl('', [
-        Validators.required,
-        Validators.maxLength(30),
-      ]),
-      email: new FormControl('', [
-        Validators.required,
-        Validators.pattern(regexMail),
-        Validators.maxLength(30),
-      ]),
-      password: new FormControl('', [
-        Validators.required,
-        Validators.required,
-        validatePassword,
-      ]),
+      name: new FormControl('', [Validators.required, Validators.maxLength(30)]),
+      lastname: new FormControl('', [Validators.required, Validators.maxLength(30)]),
+      email: new FormControl('', [Validators.required, Validators.pattern(regexMail), Validators.maxLength(30)]),
+      password: new FormControl('', [Validators.required, validatePassword]),
     });
   }
 
-  async registrarUsuario() {
-    if (this.userForm.invalid) {
-      console.log('Formulario no válido', this.userForm.errors);
-      return;
-    }
-
-    try {
-      await this.authService.registrarUsuario(this.userForm.value);
-      // console.log(this.userForm.value);
-      this.router.navigate(['/form']);
-    } catch (error) {
-      console.log(error);
-    }
+  get isFormValid(): boolean {
+    return this.userForm.valid;
   }
 
   passwordHasError(errorCode: string): boolean {
@@ -65,8 +42,28 @@ export class RegisterDialogComponent {
     return control?.hasError(errorCode) ?? false;
   }
 
+  async registerUser() {
+    if (!this.isFormValid) {
+      this.dialogService.infoDialog('Error', 'Complete todos los campos correctamente.');
+      return;
+    }
+
+    try {
+      await this.authService.registerUser(this.userForm.value);
+      this.dialogService.infoDialog('Éxito', 'Cuenta creada correctamente.');
+      this.dialogRef.close();
+      this.router.navigate(['/']);
+    } catch (error: any) {
+      let message = 'No se pudo crear la cuenta. Intente nuevamente.';
+      if (error.code === 'auth/email-already-in-use') {
+        message = 'Este correo ya está registrado. Por favor use otro.';
+      }
+      this.dialogService.infoDialog('Error', message);
+      console.error(error);
+    }
+  }
+
   closeDialog() {
     this.dialogRef.close();
-    // console.log("asd");
   }
 }

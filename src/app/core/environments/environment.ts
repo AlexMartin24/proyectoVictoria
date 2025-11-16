@@ -1,10 +1,10 @@
 export const environment = {
-    firebase: {
-        apiKey: "AIzaSyCRfVt6cgCTKFZDQbApJPn9BzX1MygFN3k",
-        authDomain: "gestion-92b25.firebaseapp.com",
-        projectId: "gestion-92b25",
-        storageBucket: "gestion-92b25.firebasestorage.app",
-        messagingSenderId: "449673515010",
-        appId: "1:449673515010:web:447549734f220e4b10171b"
-    }
+  firebase: {
+    apiKey: 'AIzaSyAgZztOZcS_CNnmunZNCtq_0d6GDk1fNlc',
+    authDomain: 'victoria-dfe70.firebaseapp.com',
+    projectId: 'victoria-dfe70',
+    storageBucket: 'victoria-dfe70.firebasestorage.app',
+    messagingSenderId: '602166536844',
+    appId: '1:602166536844:web:c531b478386674ba1d29a9',
+  },
 };

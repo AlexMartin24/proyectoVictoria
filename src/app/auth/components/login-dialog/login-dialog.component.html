@@ -13,7 +13,7 @@
     <h2 class="title">Iniciar Sesión</h2>
     <p class="subtitle">Ingresá tus datos para continuar</p>
 
-    <form [formGroup]="loginUser" (ngSubmit)="sendForm()">
+    <form [formGroup]="loginUser" (ngSubmit)="login()">
       <mat-form-field appearance="fill" class="w100">
         <mat-label>Correo Electrónico</mat-label>
         <input
@@ -34,7 +34,22 @@
         />
       </mat-form-field>
 
-      <button class="btn-primary-main" type="submit">Ingresar</button>
+      <button
+        class="btn-primary-main w100"
+        type="submit"
+        [disabled]="!isFormValid || loading"
+      >
+        <span>Ingresar</span>
+
+        <mat-progress-spinner
+          *ngIf="loading"
+          diameter="24"
+          mode="indeterminate"
+          color="accent"
+          class="spinner-button"
+        >
+        </mat-progress-spinner>
+      </button>
 
       <button
         mat-button

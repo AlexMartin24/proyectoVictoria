@@ -3,7 +3,7 @@
 // \\.[a-zA-Z]{2,}: Asegura que haya un punto seguido de al menos dos letras (por ejemplo, .com, .org, etc.).
 // (\\.[a-zA-Z]{2})?$: Opcionalmente permite un segundo dominio (como .co.uk).
 
-export const regexMail: string = "^[a-zA-Z0-9._%+-]+@(?!.*\.\.)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2})?$";
+export const regexMail: string = "^[a-zA-Z0-9._%+-]+@(?!.*\\.\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
 export const regexTextos = '^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ.\\- ]{1,50}$'; // letras, tildes, espacios, puntos, guiones
 export const regexAlfanumericoConEspacios = '^[a-zA-Z0-9 áéíóúÁÉÍÓÚñÑüÜ]{1,50}$'; // letras, acentos números y espacios

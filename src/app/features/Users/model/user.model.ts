@@ -8,7 +8,7 @@ export interface User {
   email: string;
   name?: string;
   lastname?: string;
-  role: 'usuario' | 'admin';
+  role: 'user' | 'admin' | 'guest';
   address?: string;
   birthdate?: string;
   phone?: string;
@@ -21,7 +21,7 @@ export interface NewUser {
   email: string;
   name?: string;
   lastname?: string;
-  role: 'usuario' | 'admin';
+  role: 'user' | 'admin' | 'guest';
   address?: string;
   birthdate?: string;
   phone?: string;

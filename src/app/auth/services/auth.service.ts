@@ -81,14 +81,14 @@ export class AuthService {
       const displayName = user.displayName ?? '';
       const [name = '', lastname = ''] = displayName.split(' ');
 
-      // Guardar / actualizar datos del usuario
+      // Guardar / actualizar datos del user
       await this.saveUser(user.uid, {
         uid: user.uid,
         email: user.email ?? '',
         name,
         lastname,
         photoURL: user.photoURL ?? '',
-        role: 'usuario', // DEFAULT
+        role: 'user', // DEFAULT
         enabled: true,
         createdAt: new Date().toISOString(),
       });
@@ -102,7 +102,7 @@ export class AuthService {
   // ----------------------------------------------------------------------
   // REGISTER EMAIL/PASSWORD
   // ----------------------------------------------------------------------
-  async registrarUsuario({ name, lastname, email, password }: any) {
+  async registerUser({ name, lastname, email, password }: any) {
     const cred = await createUserWithEmailAndPassword(
       this.auth,
       email,
@@ -115,7 +115,7 @@ export class AuthService {
       email,
       name,
       lastname,
-      role: 'usuario',
+      role: 'user',
       enabled: true,
       createdAt: new Date().toISOString(),
     });

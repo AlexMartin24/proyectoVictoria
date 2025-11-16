@@ -16,6 +16,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
 import { CustomDateAdapter } from '../fecha/CustomDateAdapter';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @NgModule({
@@ -37,6 +39,9 @@ import { CustomDateAdapter } from '../fecha/CustomDateAdapter';
     MatRadioModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatTabsModule,
+    MatProgressSpinnerModule,
+    
   ],
   exports: [
     CommonModule,
@@ -55,7 +60,9 @@ import { CustomDateAdapter } from '../fecha/CustomDateAdapter';
     MatRadioModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    
+    MatTabsModule,
+    MatProgressSpinnerModule,
+
   ],
   providers: [
     { provide: DateAdapter, useClass: CustomDateAdapter },

@@ -44,24 +44,6 @@ body {
   }
 }
 
-/* === Botón principal === */
-.btn-primary-main {
-  background: #4f46e5;
-  color: #fff !important;
-  border-radius: 12px;
-  padding: 0.85rem;
-  font-size: 1rem;
-  border: none;
-  font-weight: 600;
-  transition: 0.3s ease;
-  width: 100%;
-  margin-top: 5px;
-}
-
-.btn-primary-main:hover {
-  background: #4338ca;
-}
-
 /* === Botón Google === */
 .btn-google {
   display: flex;
@@ -77,6 +59,45 @@ body {
 
 .google-logo {
   height: 20px;
+}
+
+/* === Botón principal === */
+.btn-primary-main {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #4f46e5;
+  color: #fff !important;
+  transition: 0.3s ease;
+  min-height: 48px; /* fuerza altura consistente */
+}
+
+.btn-primary-main:hover {
+  background: #4338ca;
+}
+
+/* Spinner centrado */
+.spinner-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Oculta el texto cuando carga (opcional si querés) */
+.btn-primary-main span {
+  visibility: visible;
+}
+
+.btn-primary-main[disabled] span {
+  visibility: hidden; /* oculta texto cuando loading = true */
 }
 
 /* === Botón secundario === */
@@ -117,5 +138,4 @@ mat-form-field {
   margin-top: 8px;
   color: #4f46e5;
   background: transparent;
-  
 }
