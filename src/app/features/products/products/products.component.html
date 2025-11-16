@@ -1,0 +1,58 @@
+<div class="menu-container">
+  <h1 class="title">Nuestro Menú</h1>
+
+  <mat-tab-group mat-stretch-tabs="true">
+    
+    <!-- Tabs normales por categoría -->
+    <mat-tab *ngFor="let category of categories" [label]="category.label">
+      <div class="grid">
+        <mat-card
+          class="menu-card"
+          *ngFor="let item of category.products$ | async"
+        >
+          <div class="card-content-wrapper">
+            <div class="text-section">
+              <h2>{{ item.name }}</h2>
+              <p>{{ item.description }}</p>
+              <span class="price">{{ item.price | currency : "USD" }}</span>
+              <div class="button-wrapper">
+                <button mat-raised-button color="primary">Añadir</button>
+              </div>
+            </div>
+            <div class="image-section">
+              <img mat-card-image [src]="item.imageUrl" alt="{{ item.name }}" />
+            </div>
+          </div>
+        </mat-card>
+      </div>
+      <div class="empty-message" *ngIf="(category.products$ | async)?.length === 0">
+        <p>No hay productos en esta categoría</p>
+      </div>
+    </mat-tab>
+
+    <!-- Pestaña de Ofertas -->
+    <mat-tab label="Ofertas">
+      <div class="grid">
+        <mat-card class="menu-card" *ngFor="let item of offerProducts$ | async">
+          <div class="card-content-wrapper">
+            <div class="text-section">
+              <h2>{{ item.name }}</h2>
+              <p>{{ item.description }}</p>
+              <span class="price">{{ item.price | currency : "USD" }}</span>
+              <div class="button-wrapper">
+                <button mat-raised-button color="primary">Añadir</button>
+              </div>
+            </div>
+            <div class="image-section">
+              <img mat-card-image [src]="item.imageUrl" alt="{{ item.name }}" />
+            </div>
+          </div>
+        </mat-card>
+      </div>
+      <div class="empty-message" *ngIf="(offerProducts$ | async)?.length === 0">
+        <p>No hay productos en oferta</p>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>
