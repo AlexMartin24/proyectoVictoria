@@ -14,6 +14,12 @@ export const routes: Routes = [
 
     { path: '', component: ProductsComponent },
   
+    {
+  path: 'cart',
+  loadComponent: () => import('./features/cart/cart/cart.component').then(c => c.CartComponent)
+},
+
+  
 
   // { path: '', component: ResourcesComponent },
 

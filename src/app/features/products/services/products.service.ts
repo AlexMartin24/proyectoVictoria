@@ -5,7 +5,7 @@ import {
   collection,
   collectionData,
   query,
-  where
+  where,
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Product } from '../model/product.model';
@@ -14,7 +14,6 @@ import { Product } from '../model/product.model';
   providedIn: 'root',
 })
 export class ProductsService {
-  
   constructor(private firestore: Firestore) {}
 
   /**
@@ -27,7 +26,9 @@ export class ProductsService {
     );
 
     // Firestore ya devuelve los strings exactamente como están guardados
-    return collectionData(productsRef, { idField: 'id' }) as Observable<Product[]>;
+    return collectionData(productsRef, { idField: 'id' }) as Observable<
+      Product[]
+    >;
   }
 
   /**
@@ -42,12 +43,35 @@ export class ProductsService {
       `restaurants/${restaurantId}/products`
     );
 
-    const q = query(productsRef, where('category', '==', category), where('available', '==', true));
+    const q = query(
+      productsRef,
+      where('category', '==', category),
+      where('available', '==', true)
+    );
 
     return collectionData(q, { idField: 'id' }) as Observable<Product[]>;
   }
 
-    /**
+  /**
+   * Obtiene productos disponibles filtrados por ofertas (para menú del cliente)
+   */
+
+  getOfferProducts(restaurantId: string): Observable<Product[]> {
+    const productsRef = collection(
+      this.firestore,
+      `restaurants/${restaurantId}/products`
+    );
+
+    const q = query(
+      productsRef,
+      where('available', '==', true),
+      where('isOffer', '==', true)
+    );
+
+    return collectionData(q, { idField: 'id' }) as Observable<Product[]>;
+  }
+
+  /**
    * Agrega un nuevo producto a un restaurante
    * @param restaurantId Id del restaurante
    * @param product Producto a agregar
@@ -64,12 +88,13 @@ export class ProductsService {
       available: product.available ?? true, // por defecto disponible
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    }).then(() => {
-      console.log('Producto agregado correctamente');
-    }).catch((error) => {
-      console.error('Error al agregar el producto:', error);
-      throw error;
-    });
+    })
+      .then(() => {
+        console.log('Producto agregado correctamente');
+      })
+      .catch((error) => {
+        console.error('Error al agregar el producto:', error);
+        throw error;
+      });
   }
-
 }

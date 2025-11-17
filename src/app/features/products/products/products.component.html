@@ -1,58 +1,131 @@
-<div class="menu-container">
-  <h1 class="title">Nuestro Menú</h1>
+<mat-sidenav-container class="sidenav-container">
+  <!-- SIDENAV DEL CARRITO -->
+  <mat-sidenav #cartSidenav mode="over" position="end" class="cart-sidenav">
+    <!-- Header -->
+    <div class="cart-header">
+      <h2>Tu Carrito 🛒</h2>
+      <button mat-icon-button (click)="cartSidenav.close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
 
-  <mat-tab-group mat-stretch-tabs="true">
-    
-    <!-- Tabs normales por categoría -->
-    <mat-tab *ngFor="let category of categories" [label]="category.label">
-      <div class="grid">
-        <mat-card
-          class="menu-card"
-          *ngFor="let item of category.products$ | async"
-        >
-          <div class="card-content-wrapper">
-            <div class="text-section">
-              <h2>{{ item.name }}</h2>
-              <p>{{ item.description }}</p>
-              <span class="price">{{ item.price | currency : "USD" }}</span>
-              <div class="button-wrapper">
-                <button mat-raised-button color="primary">Añadir</button>
-              </div>
-            </div>
-            <div class="image-section">
-              <img mat-card-image [src]="item.imageUrl" alt="{{ item.name }}" />
+    <!-- Contenido del carrito -->
+    <div class="cart-content">
+      <ng-container *ngIf="cartItems.length; else emptyCart">
+        <mat-list-item *ngFor="let item of cartItems" class="cart-item-card">
+          <div class="item-info">
+            <h4>{{ item.product.name }}</h4>
+            <span class="price">
+              {{ item.product.price | currency:'USD' }}
+            </span>
+            <div class="quantity-controls">
+              <button mat-mini-fab color="primary" (click)="decreaseQuantity(item)">
+                -
+              </button>
+              <span>{{ item.quantity }}</span>
+              <button mat-mini-fab color="primary" (click)="increaseQuantity(item)">
+                +
+              </button>
             </div>
           </div>
-        </mat-card>
-      </div>
-      <div class="empty-message" *ngIf="(category.products$ | async)?.length === 0">
-        <p>No hay productos en esta categoría</p>
-      </div>
-    </mat-tab>
+          <button mat-icon-button color="warn" (click)="removeItem(item)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-list-item>
+      </ng-container>
 
-    <!-- Pestaña de Ofertas -->
-    <mat-tab label="Ofertas">
-      <div class="grid">
-        <mat-card class="menu-card" *ngFor="let item of offerProducts$ | async">
-          <div class="card-content-wrapper">
-            <div class="text-section">
-              <h2>{{ item.name }}</h2>
-              <p>{{ item.description }}</p>
-              <span class="price">{{ item.price | currency : "USD" }}</span>
-              <div class="button-wrapper">
-                <button mat-raised-button color="primary">Añadir</button>
-              </div>
-            </div>
-            <div class="image-section">
-              <img mat-card-image [src]="item.imageUrl" alt="{{ item.name }}" />
-            </div>
-          </div>
-        </mat-card>
-      </div>
-      <div class="empty-message" *ngIf="(offerProducts$ | async)?.length === 0">
-        <p>No hay productos en oferta</p>
-      </div>
-    </mat-tab>
+      <!-- Mensaje carrito vacío -->
+      <ng-template #emptyCart>
+        <div class="empty-message">Tu carrito está vacío 🛒</div>
+      </ng-template>
+    </div>
 
-  </mat-tab-group>
-</div>
+    <!-- Footer con total y checkout -->
+    <div class="cart-footer" *ngIf="cartItems.length">
+      <div class="total">
+        <span>Total:</span>
+        <span>{{ getTotal() | currency:'USD' }}</span>
+        <button mat-raised-button color="accent">Ir a pagar</button>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <mat-sidenav-content>
+    <div class="menu-container">
+      <div class="header-menu">
+        <h1 class="title">Nuestro Menú</h1>
+        <button mat-raised-button color="accent" (click)="cartSidenav.toggle()">
+          Ver Carrito 🛒
+        </button>
+      </div>
+
+      <mat-tab-group mat-stretch-tabs="true">
+        <!-- Tabs de categorías -->
+        <mat-tab *ngFor="let category of categories" [label]="category.label">
+          <ng-container *ngIf="category.products$ | async as products">
+            <!-- Si hay productos -->
+            <div class="grid" *ngIf="products.length > 0; else emptyCategory">
+              <mat-card class="menu-card" *ngFor="let item of products">
+                <div class="card-content-wrapper">
+                  <div class="text-section">
+                    <h2>{{ item.name }}</h2>
+                    <p>{{ item.description }}</p>
+                    <span class="price">
+                      {{ item.price | currency:'USD' }}
+                    </span>
+                    <div class="button-wrapper">
+                      <button mat-raised-button color="primary" (click)="addProductToCart(item)">
+                        Añadir 🛒
+                      </button>
+                    </div>
+                  </div>
+                  <div class="image-section">
+                    <img mat-card-image [src]="item.imageUrl" alt="{{ item.name }}" />
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+
+            <!-- Mensaje si no hay productos -->
+            <ng-template #emptyCategory>
+              <div class="empty-message">No hay productos disponibles.</div>
+            </ng-template>
+          </ng-container>
+        </mat-tab>
+
+        <!-- Tab de Ofertas -->
+        <mat-tab label="Ofertas">
+          <ng-container *ngIf="offerProducts$ | async as offers">
+            <div class="grid" *ngIf="offers.length > 0; else emptyOffers">
+              <mat-card class="menu-card" *ngFor="let item of offers">
+                <div class="card-content-wrapper">
+                  <div class="text-section">
+                    <h2>{{ item.name }}</h2>
+                    <p>{{ item.description }}</p>
+                    <span class="price">
+                      {{ item.price | currency:'USD' }}
+                    </span>
+                    <div class="button-wrapper">
+                      <button mat-raised-button color="primary" (click)="addProductToCart(item)">
+                        Añadir 🛒
+                      </button>
+                    </div>
+                  </div>
+                  <div class="image-section">
+                    <img mat-card-image [src]="item.imageUrl" alt="{{ item.name }}" />
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+
+            <!-- Mensaje si no hay ofertas -->
+            <ng-template #emptyOffers>
+              <div class="empty-message">No hay ofertas disponibles 😔</div>
+            </ng-template>
+          </ng-container>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

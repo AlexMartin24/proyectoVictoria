@@ -1,59 +1,85 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Product, PRODUCT_CATEGORIES } from '../model/product.model';
 import { ProductsService } from '../services/products.service';
-import { SharedModule } from '../../../shared/shared.module';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
+import { CartComponent } from '../../cart/cart/cart.component';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [SharedModule],
+  imports: [
+    CommonModule,
+    CartComponent,
+    MatSidenavModule,
+    MatListModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTabsModule,
+    MatCardModule
+  ],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
   categories: { label: string; products$: Observable<Product[]> }[] = [];
-  offerProducts$?: Observable<Product[]>; // <-- observable para la pestaña de ofertas
+  offerProducts$!: Observable<Product[]>;
+
+  @ViewChild('cartSidenav') cartSidenav!: MatSidenav;
+
+  cartItems: Array<{ product: Product; quantity: number }> = [];
 
   constructor(private productsService: ProductsService) {}
 
-ngOnInit(): void {
-  const restaurantId = '4FLvsZsIUx7yxeciVjKb';
-
-  // Tabs normales por categoría (solo productos disponibles)
-  this.categories = PRODUCT_CATEGORIES.map((label) => ({
-    label,
-    products$: this.productsService.getAvailableProductsByCategory(
-      restaurantId,
-      label
-    ),
-  }));
-
-  // Tab "Ofertas" (solo productos disponibles y que sean oferta)
-  this.offerProducts$ = this.productsService
-    .getAvailableProductsByCategory(restaurantId, 'offer')
-    .pipe(
-      map((products) =>
-        products.filter((p) => p.isOffer && p.available)
-      )
-    );
-}
-
-  addNewProduct() {
+  ngOnInit(): void {
     const restaurantId = '4FLvsZsIUx7yxeciVjKb';
-    const newProduct: Product = {
-      name: 'Hamburguesa doble',
-      price: 12.99,
-      category: 'Platos principales',
-      description: 'Deliciosa hamburguesa con queso y bacon',
-      imageUrl: 'https://miurl.com/hamburguesa.png',
-      isOffer: false,
-      available: true,
-    };
 
-    this.productsService.addProduct(restaurantId, newProduct)
-      .then(() => console.log('Producto agregado!'))
-      .catch(err => console.error('Error:', err));
+    // Tabs normales
+    this.categories = PRODUCT_CATEGORIES.map((label) => ({
+      label,
+      products$: this.productsService.getAvailableProductsByCategory(
+        restaurantId,
+        label
+      ),
+    }));
+
+    // Tab ofertas
+    this.offerProducts$ = this.productsService.getOfferProducts(restaurantId);
   }
 
+  addProductToCart(product: Product) {
+    const item = this.cartItems.find(ci => ci.product.name === product.name);
+    if (item) {
+      item.quantity += 1;
+    } else {
+      this.cartItems.push({ product, quantity: 1 });
+    }
+  }
+
+  increaseQuantity(item: { product: Product; quantity: number }) {
+    item.quantity += 1;
+  }
+
+  decreaseQuantity(item: { product: Product; quantity: number }) {
+    if (item.quantity > 1) {
+      item.quantity -= 1;
+    } else {
+      this.removeItem(item);
+    }
+  }
+
+  removeItem(item: { product: Product; quantity: number }) {
+    this.cartItems = this.cartItems.filter(ci => ci !== item);
+  }
+
+  getTotal() {
+    return this.cartItems.reduce((total, ci) => total + ci.product.price * ci.quantity, 0);
+  }
 }
+    
