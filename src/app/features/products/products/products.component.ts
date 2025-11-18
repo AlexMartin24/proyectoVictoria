@@ -2,28 +2,14 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Product, PRODUCT_CATEGORIES } from '../model/product.model';
 import { ProductsService } from '../services/products.service';
-import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatCardModule } from '@angular/material/card';
-import { CommonModule } from '@angular/common';
+import { MatSidenav } from '@angular/material/sidenav';
 import { CartComponent } from '../../cart/cart/cart.component';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [
-    CommonModule,
-    CartComponent,
-    MatSidenavModule,
-    MatListModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTabsModule,
-    MatCardModule
-  ],
+  imports: [CartComponent, SharedModule],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
@@ -39,8 +25,6 @@ export class ProductsComponent implements OnInit {
 
   ngOnInit(): void {
     const restaurantId = '4FLvsZsIUx7yxeciVjKb';
-
-    // Tabs normales
     this.categories = PRODUCT_CATEGORIES.map((label) => ({
       label,
       products$: this.productsService.getAvailableProductsByCategory(
@@ -48,38 +32,15 @@ export class ProductsComponent implements OnInit {
         label
       ),
     }));
-
-    // Tab ofertas
     this.offerProducts$ = this.productsService.getOfferProducts(restaurantId);
   }
 
   addProductToCart(product: Product) {
-    const item = this.cartItems.find(ci => ci.product.name === product.name);
+    const item = this.cartItems.find((ci) => ci.product.name === product.name);
     if (item) {
       item.quantity += 1;
     } else {
       this.cartItems.push({ product, quantity: 1 });
     }
   }
-
-  increaseQuantity(item: { product: Product; quantity: number }) {
-    item.quantity += 1;
-  }
-
-  decreaseQuantity(item: { product: Product; quantity: number }) {
-    if (item.quantity > 1) {
-      item.quantity -= 1;
-    } else {
-      this.removeItem(item);
-    }
-  }
-
-  removeItem(item: { product: Product; quantity: number }) {
-    this.cartItems = this.cartItems.filter(ci => ci !== item);
-  }
-
-  getTotal() {
-    return this.cartItems.reduce((total, ci) => total + ci.product.price * ci.quantity, 0);
-  }
 }
-    

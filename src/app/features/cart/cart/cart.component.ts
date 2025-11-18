@@ -1,38 +1,51 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Product } from '../../products/model/product.model';
 import { CommonModule } from '@angular/common';
-import { map } from 'rxjs';
-import { CartService } from '../services/cart.service';
-import { CartItem } from '../model/cart.model';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [SharedModule],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css'],
 })
 export class CartComponent {
-  items$ = this.cartService.items$;
-  total$ = this.items$.pipe(
-    map(items => items.reduce((sum, item) => sum + item.price * item.quantity, 0))
-  );
+  @Input() cartItems: Array<{ product: Product; quantity: number }> = [];
+  @Output() updateCart = new EventEmitter<
+    Array<{ product: Product; quantity: number }>
+  >();
 
-  constructor(private cartService: CartService) {}
-
-  increase(item: CartItem) {
-    this.cartService.addToCart(item, 1);
+  increaseQuantity(item: { product: Product; quantity: number }) {
+    item.quantity += 1;
+    this.emitCartUpdate();
   }
 
-  decrease(item: CartItem) {
-    this.cartService.addToCart(item, -1);
-    if (item.quantity <= 1) this.cartService.removeFromCart(item.id!);
+  decreaseQuantity(item: { product: Product; quantity: number }) {
+    if (item.quantity > 1) {
+      item.quantity -= 1;
+    } else {
+      this.removeItem(item);
+    }
+    this.emitCartUpdate();
   }
 
-  remove(item: CartItem) {
-    this.cartService.removeFromCart(item.id!);
+  removeItem(item: { product: Product; quantity: number }) {
+    this.cartItems = this.cartItems.filter((ci) => ci !== item);
+    this.emitCartUpdate();
   }
 
-  clear() {
-    this.cartService.clearCart();
+  getTotal() {
+    return this.cartItems.reduce(
+      (total, ci) => total + ci.product.price * ci.quantity,
+      0
+    );
+  }
+
+  private emitCartUpdate() {
+    this.updateCart.emit(this.cartItems);
   }
 }

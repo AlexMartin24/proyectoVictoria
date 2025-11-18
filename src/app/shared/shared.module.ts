@@ -13,9 +13,7 @@ import { SizeTittleDirective } from './directives/size-tittle.directive';
     BooleanStyleDirective,
     SizeTittleDirective,
   ],
-  imports: [
-    MaterialModule, 
-    ReactiveFormsModule],
+  imports: [MaterialModule, ReactiveFormsModule],
   exports: [
     MaterialModule,
     ReactiveFormsModule,

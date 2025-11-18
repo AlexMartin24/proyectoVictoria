@@ -1,40 +1,34 @@
 <div class="cart-header">
-  Tu Carrito 🛒
+  <h2>Tu Carrito 🛒</h2>
 </div>
 
 <div class="cart-content">
+  <ng-container *ngIf="cartItems.length; else emptyCart">
+    <mat-list-item *ngFor="let item of cartItems" class="cart-item-card">
+      <div class="item-info">
+        <h4>{{ item.product.name }}</h4>
+        <span class="price">{{ item.product.price | currency: 'USD' }}</span>
+        <div class="quantity-controls">
+          <button mat-mini-fab color="primary" (click)="decreaseQuantity(item)">-</button>
+          <span>{{ item.quantity }}</span>
+          <button mat-mini-fab color="primary" (click)="increaseQuantity(item)">+</button>
+        </div>
+      </div>
+      <button mat-icon-button color="warn" (click)="removeItem(item)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-list-item>
+  </ng-container>
 
-  <div *ngIf="(items$ | async)?.length === 0">
-    <p>Tu carrito está vacío</p>
-  </div>
-
-  <div *ngFor="let item of items$ | async" class="cart-item">
-
-    <p>
-      <strong>{{ item.name }}</strong><br>
-      {{ item.price | currency:'USD' }}
-    </p>
-
-    <div class="quantity-controls">
-      <button (click)="decrease(item)">−</button>
-      <span>{{ item.quantity }}</span>
-      <button (click)="increase(item)">+</button>
-    </div>
-
-    <button (click)="remove(item)" style="margin-top: 8px;">Eliminar</button>
-
-  </div>
-
+  <ng-template #emptyCart>
+    <div class="empty-message">Tu carrito está vacío 🛒</div>
+  </ng-template>
 </div>
 
-<div class="cart-footer">
-  <h3>Total: {{ total$ | async | currency:'USD' }}</h3>
-
-  <button mat-flat-button color="primary">
-    Finalizar compra
-  </button>
-
-  <button mat-button color="warn" (click)="clear()">
-    Vaciar carrito
-  </button>
+<div class="cart-footer" *ngIf="cartItems.length">
+  <div class="total">
+    <span>Total:</span>
+    <span>{{ getTotal() | currency: 'USD' }}</span>
+    <button mat-raised-button color="accent">Ir a pagar</button>
+  </div>
 </div>

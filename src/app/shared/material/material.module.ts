@@ -19,7 +19,7 @@ import { CustomDateAdapter } from '../fecha/CustomDateAdapter';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
-
+import { MatListModule } from '@angular/material/list';
 
 @NgModule({
   declarations: [],
@@ -43,7 +43,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatSidenavModule,
-
+    MatListModule,
   ],
   exports: [
     CommonModule,
@@ -65,11 +65,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatSidenavModule,
-
+    MatListModule,
   ],
-  providers: [
-    { provide: DateAdapter, useClass: CustomDateAdapter },
-  ],
-
+  providers: [{ provide: DateAdapter, useClass: CustomDateAdapter }],
 })
 export class MaterialModule {}
