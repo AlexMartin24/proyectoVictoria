@@ -1,6 +1,5 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #cartSidenav mode="over" position="end" class="cart-sidenav">
-    <!-- Usamos el nuevo componente -->
     <app-cart
       [cartItems]="cartItems"
       (updateCart)="cartItems = $event"
@@ -9,31 +8,109 @@
 
   <mat-sidenav-content>
     <div class="menu-container">
+      <!-- Header -->
       <div class="header-menu">
-        <h1 class="title">Nuestro Menú</h1>
-        <button mat-raised-button color="accent" (click)="cartSidenav.toggle()">
-          Ver Carrito 🛒
+        <div class="title-container">
+          <h1 class="title">🍽️ Nuestra Carta</h1>
+          <p class="subtitle">
+            Descubre nuestros platos más deliciosos y ofertas especiales
+          </p>
+        </div>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="cartSidenav.toggle()"
+          class="cart-button"
+        >
+          🛒 Carrito
+          <span class="cart-badge" *ngIf="cartItems.length > 0">
+            {{ getCartQuantity() }}
+          </span>
         </button>
       </div>
 
+      <!-- Pestañas: Categorías + Ofertas -->
       <mat-tab-group mat-stretch-tabs="true">
+        <!-- Pestaña de Ofertas -->
+        <mat-tab label="🔥 Ofertas">
+          <ng-container *ngIf="offerProducts$ | async as offerProducts">
+            <div class="grid" *ngIf="offerProducts.length > 0; else emptyOffer">
+              <mat-card
+                class="menu-card"
+                [ngClass]="{ offer: item.isOffer }"
+                *ngFor="let item of offerProducts"
+              >
+                <div class="card-content-wrapper">
+                  <!-- Imagen -->
+                  <div class="image-section">
+                    <img
+                      mat-card-image
+                      [src]="item.imageUrl || 'assets/img/not-found.png'"
+                      alt="{{ item.name }}"
+                      (click)="openImageModal(item.imageUrl)"
+                      (error)="onImageError($event)"
+                    />
+                  </div>
+
+                  <!-- Información -->
+                  <div class="text-section">
+                    <h2>{{ item.name }}</h2>
+                    <p>{{ item.description }}</p>
+                    <span class="price">{{
+                      item.price | currency : "USD"
+                    }}</span>
+                    <div class="button-wrapper">
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="addProductToCart(item)"
+                      >
+                        Añadir 🛒
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </mat-card>
+            </div>
+            <ng-template #emptyOffer>
+              <div class="empty-message">No hay ofertas disponibles.</div>
+            </ng-template>
+          </ng-container>
+        </mat-tab>
+
+        <!-- Pestañas de Categorías -->
         <mat-tab *ngFor="let category of categories" [label]="category.label">
           <ng-container *ngIf="category.products$ | async as products">
             <div class="grid" *ngIf="products.length > 0; else emptyCategory">
               <mat-card class="menu-card" *ngFor="let item of products">
                 <div class="card-content-wrapper">
+                  <!-- Imagen -->
+                  <div class="image-section">
+                    <img
+                      mat-card-image
+                      [src]="item.imageUrl || 'assets/img/not-found.png'"
+                      alt="{{ item.name }}"
+                      (click)="openImageModal(item.imageUrl)"
+                      (error)="onImageError($event)"
+                    />
+                  </div>
+
+                  <!-- Información -->
                   <div class="text-section">
                     <h2>{{ item.name }}</h2>
                     <p>{{ item.description }}</p>
-                    <span class="price">{{ item.price | currency:'USD' }}</span>
+                    <span class="price">{{
+                      item.price | currency : "USD"
+                    }}</span>
                     <div class="button-wrapper">
-                      <button mat-raised-button color="primary" (click)="addProductToCart(item)">
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="addProductToCart(item)"
+                      >
                         Añadir 🛒
                       </button>
                     </div>
-                  </div>
-                  <div class="image-section">
-                    <img mat-card-image [src]="item.imageUrl" alt="{{ item.name }}" />
                   </div>
                 </div>
               </mat-card>
@@ -44,6 +121,11 @@
           </ng-container>
         </mat-tab>
       </mat-tab-group>
+    </div>
+
+    <!-- Modal de imagen ampliada -->
+    <div class="image-modal" *ngIf="selectedImage" (click)="closeImageModal()">
+      <img [src]="selectedImage" alt="Imagen ampliada" />
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

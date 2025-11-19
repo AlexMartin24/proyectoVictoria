@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Product, PRODUCT_CATEGORIES } from '../model/product.model';
 import { ProductsService } from '../services/products.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -14,33 +15,56 @@ import { SharedModule } from '../../../shared/shared.module';
   styleUrls: ['./products.component.css'],
 })
 export class ProductsComponent implements OnInit {
-  categories: { label: string; products$: Observable<Product[]> }[] = [];
-  offerProducts$!: Observable<Product[]>;
-
   @ViewChild('cartSidenav') cartSidenav!: MatSidenav;
 
   cartItems: Array<{ product: Product; quantity: number }> = [];
+  selectedImage: string | null = null;
+
+  // Categorías normales
+  categories: { label: string; products$: Observable<Product[]> }[] = [];
+  // Pestaña de ofertas
+  offerProducts$!: Observable<Product[]>;
 
   constructor(private productsService: ProductsService) {}
 
   ngOnInit(): void {
     const restaurantId = '4FLvsZsIUx7yxeciVjKb';
+
+    // Inicializar categorías
     this.categories = PRODUCT_CATEGORIES.map((label) => ({
       label,
-      products$: this.productsService.getAvailableProductsByCategory(
-        restaurantId,
-        label
-      ),
+      products$: this.productsService
+        .getAvailableProductsByCategory(restaurantId, label),
     }));
+
+    // Inicializar pestaña de ofertas
     this.offerProducts$ = this.productsService.getOfferProducts(restaurantId);
   }
 
   addProductToCart(product: Product) {
-    const item = this.cartItems.find((ci) => ci.product.name === product.name);
+    const item = this.cartItems.find((ci) => ci.product.id === product.id);
     if (item) {
       item.quantity += 1;
     } else {
       this.cartItems.push({ product, quantity: 1 });
     }
+  }
+
+  getCartQuantity(): number {
+    return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  openImageModal(imageUrl: string | undefined) {
+    if (imageUrl) {
+      this.selectedImage = imageUrl;
+    }
+  }
+
+  closeImageModal() {
+    this.selectedImage = null;
+  }
+
+  onImageError(event: any) {
+    event.target.src = 'assets/img/not-found.png';
   }
 }
