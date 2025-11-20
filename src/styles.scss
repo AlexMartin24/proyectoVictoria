@@ -6,32 +6,33 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-/* Color de fondo global (modo claro por defecto) */
-html, body, app-root {
-  background-color: #fafafa;
+  background-color: #fafafa; /* Fondo claro por defecto */
   color: #212121;
 }
 
-/* Fix para que los diálogos de Angular Material aparezcan arriba */
-.cdk-global-overlay-wrapper,
-.cdk-overlay-container {
-  z-index: 1050 !important;
+app-root {
+  height: 100%;
 }
 
-/* Overlays de Material */
-.mat-mdc-dialog-container {
-  z-index: 2000 !important;
-}
 
-/* Si usás Bootstrap, esto evita conflictos */
-.modal-backdrop.show {
-  z-index: 1040 !important;
-}
+// /* Fix para que los diálogos de Angular Material aparezcan arriba */
+// .cdk-global-overlay-wrapper,
+// .cdk-overlay-container {
+//   z-index: 1050 !important;
+// }
 
-.modal {
-  z-index: 1050 !important;
-}
+// /* Overlays de Material */
+// .mat-mdc-dialog-container {
+//   z-index: 2000 !important;
+// }
+
+// /* Si usás Bootstrap, esto evita conflictos */
+// .modal-backdrop.show {
+//   z-index: 1040 !important;
+// }
+
+// .modal {
+//   z-index: 1050 !important;
+// }
 
 /* Puedes agregar tus estilos propios acá */

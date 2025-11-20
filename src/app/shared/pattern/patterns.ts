@@ -5,10 +5,12 @@
 
 export const regexMail: string = "^[a-zA-Z0-9._%+-]+@(?!.*\\.\\.)[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
-export const regexTextos = '^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ.\\- ]{1,50}$'; // letras, tildes, espacios, puntos, guiones
-export const regexAlfanumericoConEspacios = '^[a-zA-Z0-9 áéíóúÁÉÍÓÚñÑüÜ]{1,50}$'; // letras, acentos números y espacios
-export const regexDireccion = '^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9.\\- ]{1,50}$'; // letras, números, tildes, espacios
-export const regexNumeros = '^[0-9]{1,10}$'; // solo números (para cantidades)
+export const regexAlfanumericoConEspacios = '^[a-zA-Z0-9 áéíóúÁÉÍÓÚñÑüÜ]{1,50}$'; // Letras, números y espacios
+export const regexDescripcion = '^[a-zA-Z0-9 áéíóúÁÉÍÓÚñÑüÜ,\\.\\-]{1,255}$'; // Descripción con comas, puntos y guiones
+export const regexDireccion = '^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ.\\- ]{1,50}$'; // Dirección con letras, números, puntos y guiones
+export const regexNumeros = '^[0-9]{1,10}$'; // Solo números (para cantidades)
+export const regexTelefono = '^\\+?[0-9]{1,4}[0-9]{6,14}$'; // Validación de teléfonos internacionales
+export const regexTextos = '^[a-zA-Z0-9 áéíóúÁÉÍÓÚñÑüÜ,\\.\\-]{1,50}$'; // Letras, espacios, puntos y guiones
 
 
 // pattern contraseña. Debe contener al menos una letra minúscula, una mayúscula, un número, un carácter especial, al menos 8  y maximo 64 caracteres
