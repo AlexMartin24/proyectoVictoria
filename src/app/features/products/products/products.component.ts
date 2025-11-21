@@ -42,7 +42,7 @@ export class ProductsComponent implements OnInit {
   }
 
   addProductToCart(product: Product) {
-    const item = this.cartItems.find((ci) => ci.product.id === product.id);
+    const item = this.cartItems.find((ci) => ci.product.productId === product.productId);
     if (item) {
       item.quantity += 1;
     } else {

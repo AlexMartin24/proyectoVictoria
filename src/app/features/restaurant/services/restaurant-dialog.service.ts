@@ -18,10 +18,10 @@ export class RestaurantDialogService {
   }): Observable<Restaurant> {
     const dialogRef = this.dialog.open(RestaurantDialogComponent, {
       disableClose: true,
-  width: '600px',
-  maxHeight: '90vh',
-  panelClass: 'custom-dialog-container',
-  hasBackdrop: true,
+      width: '600px',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
+      hasBackdrop: true,
       data: {
         mode: options.mode,
         restaurant:
@@ -33,8 +33,12 @@ export class RestaurantDialogService {
                 phone: '',
                 description: '',
                 addressNumber: 0,
-                enabled: false  ,
+                enabled: false,
                 createdAt: new Date(),
+                updatedAt: new Date().toISOString(),
+                address: '',
+                openingHours: '',
+                cuisineType: '',
                 imageLogo: '',
                 mainImage: '',
               },

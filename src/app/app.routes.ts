@@ -4,7 +4,7 @@ import { FormComponent } from './auth/form/form.component';
 import { IndexComponent } from './core/components/index/index.component';
 import { ListUserComponent } from './features/Users/list-user/list-user.component';
 import { ProductsComponent } from './features/products/products/products.component';
-import { RestaurantComponent } from './features/restaurant/restaurant/restaurant.component';
+import { RestaurantProfileComponent } from './features/restaurant/restaurant-profile/restaurant-profile.component';
 
 export const routes: Routes = [
   { path: 'form', component: FormComponent },
@@ -14,7 +14,9 @@ export const routes: Routes = [
 
   // { path: '', component: ProductsComponent },
 
-  { path: '', component: RestaurantComponent },
+  // { path: '', component: RestaurantComponent },
+  // { path: 'restaurant-profile/:id', component: RestaurantProfileComponent },
+
   {
     path: 'cart',
     loadComponent: () =>
@@ -30,6 +32,14 @@ export const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.routes').then((m) => m.AUTH_ROUTES),
+  },
+
+  {
+    path: 'restaurant',
+    loadChildren: () =>
+      import('./features/restaurant/routes/restaurant.routes').then(
+        (m) => m.RESTAURANT_ROUTES
+      ),
   },
 
   {

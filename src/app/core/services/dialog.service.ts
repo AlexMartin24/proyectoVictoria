@@ -17,6 +17,12 @@ export class DialogService {
     type?: 'confirm' | 'info' | 'error' | 'question' | 'enable';
   }) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      disableClose: true,
+      width: '600px',
+      maxHeight: '90vh',
+      panelClass: 'custom-dialog-container',
+      hasBackdrop: true,
+
       data: {
         title: options.title,
         message: options.message,
