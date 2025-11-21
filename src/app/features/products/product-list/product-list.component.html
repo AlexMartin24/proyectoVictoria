@@ -1,0 +1,60 @@
+<mat-card>
+  <mat-form-field appearance="outline">
+    <mat-label>Buscar</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Buscar por nombre, categoría..."/>
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <!-- Nombre -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+      <td mat-cell *matCellDef="let p">{{ p.name }}</td>
+    </ng-container>
+
+    <!-- Precio -->
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Precio</th>
+      <td mat-cell *matCellDef="let p">{{ p.price | currency }}</td>
+    </ng-container>
+
+    <!-- Disponible -->
+    <ng-container matColumnDef="available">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Disponible</th>
+      <td mat-cell *matCellDef="let p">{{ p.available ? "Sí" : "No" }}</td>
+    </ng-container>
+
+    <!-- Categoría -->
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Categoría</th>
+      <td mat-cell *matCellDef="let p">{{ p.category || '-' }}</td>
+    </ng-container>
+
+    <!-- Oferta -->
+    <ng-container matColumnDef="isOffer">
+      <th mat-header-cell *matHeaderCellDef>Oferta</th>
+      <td mat-cell *matCellDef="let p">{{ p.isOffer ? "Sí" : "No" }}</td>
+    </ng-container>
+
+    <!-- Acciones -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let p">
+        <button mat-icon-button color="primary" (click)="onEdit(p)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="onRemove(p)" *ngIf="p.available">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" (click)="onEnable(p)" *ngIf="!p.available">
+          <mat-icon>restore_from_trash</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let p; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator [pageSize]="10"></mat-paginator>
+</mat-card>

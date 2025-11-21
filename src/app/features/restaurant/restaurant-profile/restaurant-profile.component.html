@@ -14,10 +14,13 @@
     <button mat-raised-button color="primary" (click)="editRestaurant()">
       Editar Perfil
     </button>
-    <button mat-raised-button color="accent">Administrar Menú</button>
-    <button mat-raised-button [color]="restaurant.enabled ? 'warn' : 'primary'">
-      {{ restaurant.enabled ? "Desactivar" : "Activar" }}
+    <button mat-raised-button color="accent" (click)="goToMenu()">
+      Administrar Menú
     </button>
+
+    <!-- <button mat-raised-button [color]="restaurant.enabled ? 'warn' : 'primary'">
+      {{ restaurant.enabled ? "Desactivar" : "Activar" }}
+    </button> -->
   </div>
 
   <div class="content-wrapper">
@@ -48,6 +51,8 @@
         </p>
       </mat-card-content>
     </mat-card>
+
+    <app-product-list [products]="dataSource.data"></app-product-list>
 
     <mat-card class="stats-card">
       <mat-card-title>Estadísticas</mat-card-title>

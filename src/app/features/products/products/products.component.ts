@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { Product, PRODUCT_CATEGORIES } from '../model/product.model';
-import { ProductsService } from '../services/products.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { CartComponent } from '../../cart/cart/cart.component';
 import { SharedModule } from '../../../shared/shared.module';
+import { ActivatedRoute } from '@angular/router';
+import { RestaurantService } from '../../restaurant/services/restaurant.service';
+import { ProductService } from '../services/product.service';
 
 @Component({
   selector: 'app-products',
@@ -25,24 +27,49 @@ export class ProductsComponent implements OnInit {
   // Pestaña de ofertas
   offerProducts$!: Observable<Product[]>;
 
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private productsService: ProductService,
+    private route: ActivatedRoute,
+    private restaurantService: RestaurantService
+  ) {}
 
   ngOnInit(): void {
-    const restaurantId = '4FLvsZsIUx7yxeciVjKb';
+    this.initializeProducts();
+  }
 
-    // Inicializar categorías
-    this.categories = PRODUCT_CATEGORIES.map((label) => ({
-      label,
-      products$: this.productsService
-        .getAvailableProductsByCategory(restaurantId, label),
-    }));
+  initializeProducts() {
+    this.route.paramMap
+      .pipe(
+        switchMap((params) => {
+          const slug = params.get('slug');
+          if (!slug) throw new Error('No se recibió slug del restaurante');
+          // Obtener restaurantId a partir del slug
+          return this.restaurantService.getRestaurantBySlug(slug);
+        })
+      )
+      .subscribe((restaurant) => {
+        if (!restaurant) return;
 
-    // Inicializar pestaña de ofertas
-    this.offerProducts$ = this.productsService.getOfferProducts(restaurantId);
+        const restaurantId = restaurant.restaurantId!;
+        // Inicializar categorías
+        this.categories = PRODUCT_CATEGORIES.map((label) => ({
+          label,
+          products$: this.productsService.getAvailableProductsByCategory(
+            restaurantId,
+            label
+          ),
+        }));
+
+        // Inicializar pestaña de ofertas
+        this.offerProducts$ =
+          this.productsService.getOfferProducts(restaurantId);
+      });
   }
 
   addProductToCart(product: Product) {
-    const item = this.cartItems.find((ci) => ci.product.productId === product.productId);
+    const item = this.cartItems.find(
+      (ci) => ci.product.productId === product.productId
+    );
     if (item) {
       item.quantity += 1;
     } else {

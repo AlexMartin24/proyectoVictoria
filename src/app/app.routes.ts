@@ -5,6 +5,7 @@ import { IndexComponent } from './core/components/index/index.component';
 import { ListUserComponent } from './features/Users/list-user/list-user.component';
 import { ProductsComponent } from './features/products/products/products.component';
 import { RestaurantProfileComponent } from './features/restaurant/restaurant-profile/restaurant-profile.component';
+import { ProductListComponent } from './features/products/product-list/product-list.component';
 
 export const routes: Routes = [
   { path: 'form', component: FormComponent },
@@ -27,7 +28,9 @@ export const routes: Routes = [
 
   // { path: '', component: ResourcesComponent },
 
-  // { path: '', component: ListSchoolsComponent },
+
+     { path: '', component: ProductListComponent },
+
 
   {
     path: 'auth',

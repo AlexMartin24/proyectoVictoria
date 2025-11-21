@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
 import { Restaurant } from '../model/restaurant.model';
 import { RestaurantService } from '../services/restaurant.service';
@@ -8,11 +8,12 @@ import { Product } from '../../products/model/product.model';
 import { Subscription } from 'rxjs';
 import { DialogService } from '../../../core/services/dialog.service';
 import { RestaurantDialogService } from '../services/restaurant-dialog.service';
+import { ProductListComponent } from '../../products/product-list/product-list.component';
 
 @Component({
   selector: 'app-restaurant-profile',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, ProductListComponent],
   templateUrl: './restaurant-profile.component.html',
   styleUrl: './restaurant-profile.component.css',
 })
@@ -30,7 +31,8 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private restaurantService: RestaurantService,
     private dialogService: DialogService,
-    private restaurantDialogService: RestaurantDialogService
+    private restaurantDialogService: RestaurantDialogService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -78,5 +80,11 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
           );
         }
       });
+  }
+
+  goToMenu() {
+    this.router.navigate([this.restaurant.slug, 'menu'], {
+      relativeTo: this.route.parent,
+    });
   }
 }
