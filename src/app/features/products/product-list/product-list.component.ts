@@ -1,75 +1,59 @@
 import {
-  AfterViewInit,
   Component,
   EventEmitter,
   Input,
-  OnChanges,
-  OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
+  AfterViewInit,
+  ChangeDetectorRef,
 } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { Product } from '../model/product.model';
 import { SharedModule } from '../../../shared/shared.module';
+import { BaseTableComponent } from '../../../shared/components/base-table/base-table.component';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BaseTableComponent],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css'],
 })
-export class ProductListComponent implements OnInit, AfterViewInit, OnChanges {
+export class ProductListComponent implements AfterViewInit {
+  // Lista de productos que recibe desde el componente padre
   @Input() products: Product[] = [];
 
-  @Output() selectProduct = new EventEmitter<string>();
+  // Eventos que el componente emite hacia el padre
   @Output() edit = new EventEmitter<Product>();
   @Output() remove = new EventEmitter<Product>();
   @Output() enable = new EventEmitter<Product>();
   @Output() disable = new EventEmitter<Product>();
+  @Output() create = new EventEmitter<void>();
 
-  displayedColumns: string[] = [
-    'name',
-    'price',
-    'available',
-    'category',
-    'isOffer',
-    'actions',
-  ];
+  // Referencias a templates definidos en el HTML (para columnas personalizadas)
+  @ViewChild('tplAvailable', { static: true }) tplAvailable: any;
+  @ViewChild('tplOffer', { static: true }) tplOffer: any;
 
-  dataSource = new MatTableDataSource<Product>();
+  // Definición dinámica de columnas para la tabla
+  columns: any[] = [];
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  constructor(private cdr: ChangeDetectorRef) {}
 
-  ngOnInit() {
-    this.dataSource.data = this.products;
-  }
-
+  // Se ejecuta después de que las vistas hijas estén cargadas
+  // Aquí se inicializan las columnas de la tabla usando los templates
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.columns = [
+      { id: 'name', label: 'Nombre' },
+      { id: 'price', label: 'Precio' },
+      { id: 'available', label: 'Disponible', template: this.tplAvailable },
+      { id: 'category', label: 'Categoría' },
+      { id: 'isOffer', label: 'Oferta', template: this.tplOffer },
+    ];
+
+    // Se fuerza la detección de cambios porque las columnas se definen después de la vista
+    this.cdr.detectChanges();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['products']) {
-      this.dataSource.data = this.products;
-    }
-  }
-
-  /** Aplica filtro de búsqueda en la tabla */
-  applyFilter(event: Event) {
-    const value = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.dataSource.filter = value;
-  }
-
-  onSelect(id: string) {
-    this.selectProduct.emit(id);
-  }
-
+  // Métodos que envían los eventos al componente padre
   onEdit(product: Product) {
     this.edit.emit(product);
   }
@@ -84,5 +68,15 @@ export class ProductListComponent implements OnInit, AfterViewInit, OnChanges {
 
   onDisable(product: Product) {
     this.disable.emit(product);
+  }
+
+  // ID del restaurante padre que se recibe por @Input
+  @Input() restaurantId!: string;
+
+  // Evento para notificar la creación de un producto nuevo
+  @Output() productCreated = new EventEmitter<void>();
+
+  onCreate() {
+    this.productCreated.emit();
   }
 }

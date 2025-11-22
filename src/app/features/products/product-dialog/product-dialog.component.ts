@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Product } from '../model/product.model';
 
@@ -53,20 +53,17 @@ export class ProductDialogComponent {
     });
   }
 
-  saveProduct() {
-    if (this.editForm.valid) {
-      const formData = this.editForm.value;
-
-      // Solo asigna productId en modo 'edit'
-      if (this.mode === 'edit') {
-        formData.productId = this.data.product?.productId;
-      }
-
-      this.dialogRef.close(formData);
-    } else {
-      this.editForm.markAllAsTouched();
+saveProduct() {
+  if (this.editForm.valid) {
+    const formData = this.editForm.value;
+    if (this.mode === 'edit') {
+      formData.productId = this.data.product?.productId;
     }
+    this.dialogRef.close(formData); // <-- NO incluye restaurantId
+  } else {
+    this.editForm.markAllAsTouched();
   }
+}
 
   cancel() {
     this.dialogRef.close();

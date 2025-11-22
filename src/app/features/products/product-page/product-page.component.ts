@@ -2,10 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { ProductListComponent } from '../product-list/product-list.component';
 import { Product } from '../model/product.model';
-import { DialogService } from '../../../core/services/dialog.service';
 import { Subscription } from 'rxjs';
 import { ProductDialogService } from '../services/product-dialog.service';
 import { ProductService } from '../services/product.service';
+import { DialogService } from '../../../core/services/dialog.service';
 
 @Component({
   selector: 'app-product-page',
@@ -16,12 +16,9 @@ import { ProductService } from '../services/product.service';
 })
 export class ProductPageComponent implements OnInit, OnDestroy {
   showDisabledTable = false;
-  private productsSub?: Subscription;
-
-  // ⚠️ Asegúrate de obtener este ID del restaurante logueado
-  private restaurantId: string = 'RESTAURANT_ID_AQUI';
-
   products: Product[] = [];
+  private productsSub?: Subscription;
+  private restaurantId = 'RESTAURANT_ID_AQUI';
 
   constructor(
     private productService: ProductService,
@@ -38,7 +35,9 @@ export class ProductPageComponent implements OnInit, OnDestroy {
   }
 
   /** Crear producto */
-  createProduct() {
+  onCreate() {
+    console.log('ProductPageComponent: onCreate llamado');
+
     this.productDialogService
       .openProductDialog({ mode: 'create' })
       .subscribe(async (result) => {
@@ -69,7 +68,6 @@ export class ProductPageComponent implements OnInit, OnDestroy {
   /** Cargar productos */
   private loadProducts() {
     this.productsSub?.unsubscribe();
-
     this.productsSub = this.productService
       .getAllProductsFromRestaurant(this.restaurantId)
       .subscribe((data) => {

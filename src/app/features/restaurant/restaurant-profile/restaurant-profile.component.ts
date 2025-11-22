@@ -9,6 +9,8 @@ import { Subscription } from 'rxjs';
 import { DialogService } from '../../../core/services/dialog.service';
 import { RestaurantDialogService } from '../services/restaurant-dialog.service';
 import { ProductListComponent } from '../../products/product-list/product-list.component';
+import { ProductService } from '../../products/services/product.service';
+import { ProductDialogService } from '../../products/services/product-dialog.service';
 
 @Component({
   selector: 'app-restaurant-profile',
@@ -32,7 +34,9 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
     private restaurantService: RestaurantService,
     private dialogService: DialogService,
     private restaurantDialogService: RestaurantDialogService,
-    private router: Router
+    private router: Router,
+    private productService: ProductService,
+    private productDialogService: ProductDialogService
   ) {}
 
   ngOnInit() {
@@ -87,4 +91,21 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
       relativeTo: this.route.parent,
     });
   }
+
+  createProductDialog() {
+  this.productDialogService
+    .openProductDialog({ mode: 'create' })
+    .subscribe(async (result) => {
+      if (!result) return;
+
+      await this.productService.createProduct({
+        ...result,
+        restaurantId: this.restaurant.restaurantId!,
+      });
+
+      this.dialogService.infoDialog('Éxito', 'Producto creado correctamente.');
+      this.loadProducts(this.restaurant.restaurantId!);
+    });
+}
+
 }

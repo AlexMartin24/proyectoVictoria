@@ -9,6 +9,8 @@ export interface Product {
   isOffer?: boolean;
   createdAt?: string;
   updatedAt?: string;
+    restaurantId: string;
+
 }
 
 export const PRODUCT_CATEGORIES = [

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResourceDialogComponent } from './resource-dialog.component';
+import { BaseTableComponent } from './base-table.component';
 
-describe('ResourceDialogComponent', () => {
-  let component: ResourceDialogComponent;
-  let fixture: ComponentFixture<ResourceDialogComponent>;
+describe('BaseTableComponent', () => {
+  let component: BaseTableComponent;
+  let fixture: ComponentFixture<BaseTableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ResourceDialogComponent]
+      imports: [BaseTableComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(ResourceDialogComponent);
+    fixture = TestBed.createComponent(BaseTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

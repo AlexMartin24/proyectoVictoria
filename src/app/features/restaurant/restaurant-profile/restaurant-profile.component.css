@@ -23,7 +23,9 @@
   align-items: center;
   gap: 16px;
   color: white;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.4);
+  width: fit-content;
 }
 
 .logo {
@@ -41,10 +43,11 @@
   padding: 0 16px; /* margen lateral */
 }
 
-.info-card, .stats-card {
+.info-card,
+.stats-card {
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .stats-grid {
@@ -74,14 +77,11 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 12px;
-    margin: 20px 0; 
+  margin: 20px 0;
+  justify-content: space-around;
+}
 
-}
-.actions button {
-  min-width: 150px;
-}
 @media (max-width: 600px) {
   .logo {
     width: 60px;

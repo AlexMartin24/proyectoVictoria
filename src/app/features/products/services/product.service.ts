@@ -73,78 +73,63 @@ export class ProductService {
     return collectionData(q, { idField: 'id' }) as Observable<Product[]>;
   }
 
-
   /* ========================= CREATE ========================= */
-async createProduct(data: Partial<Product> & { restaurantId: string }): Promise<Product> {
+async createProduct(data: Partial<Product> & { restaurantId: string }) {
   if (!data.restaurantId) {
     throw new Error('restaurantId es obligatorio para crear un producto');
   }
-
-  const now = new Date();
+    const now = new Date();
 
   const productsRef = collection(
     this.firestore,
     `restaurants/${data.restaurantId}/products`
   );
 
-  const docRef = await addDoc(productsRef, {
-    ...data,
-    available: data.available ?? true, // valor por defecto
-    createdAt: now,
-    updatedAt: now,
-  });
-
-  return {
-    ...data,
-    productId: docRef.id,
-    createdAt: now.toISOString(),
-    updatedAt: now.toISOString(),
-  } as Product;
+  const docRef = await addDoc(productsRef, { ...data, available: data.available ?? true, createdAt: now, updatedAt: now });
+  
+  return { ...data, productId: docRef.id, createdAt: now.toISOString(), updatedAt: now.toISOString() } as Product;
 }
 
-      /* ========================= UPDATE ========================= */
-async updateProductData(
-  restaurantId: string,
-  productId: string,
-  updatedData: Partial<Product>
-): Promise<void> {
-  const productRef = doc(
-    this.firestore,
-    `restaurants/${restaurantId}/products/${productId}`
-  );
+  /* ========================= UPDATE ========================= */
+  async updateProductData(
+    restaurantId: string,
+    productId: string,
+    updatedData: Partial<Product>
+  ): Promise<void> {
+    const productRef = doc(
+      this.firestore,
+      `restaurants/${restaurantId}/products/${productId}`
+    );
 
-  const payload: any = {
-    ...updatedData,
-    updatedAt: new Date(),
-  };
+    const payload: any = {
+      ...updatedData,
+      updatedAt: new Date(),
+    };
 
-  await updateDoc(productRef, payload);
-}
+    await updateDoc(productRef, payload);
+  }
 
+  async disableProduct(restaurantId: string, productId: string) {
+    const productRef = doc(
+      this.firestore,
+      `restaurants/${restaurantId}/products/${productId}`
+    );
 
-async disableProduct(restaurantId: string, productId: string) {
-  const productRef = doc(
-    this.firestore,
-    `restaurants/${restaurantId}/products/${productId}`
-  );
+    await updateDoc(productRef, {
+      available: false,
+      updatedAt: new Date(),
+    });
+  }
 
-  await updateDoc(productRef, {
-    available: false,
-    updatedAt: new Date(),
-  });
-}
+  async enableProduct(restaurantId: string, productId: string) {
+    const productRef = doc(
+      this.firestore,
+      `restaurants/${restaurantId}/products/${productId}`
+    );
 
-async enableProduct(restaurantId: string, productId: string) {
-  const productRef = doc(
-    this.firestore,
-    `restaurants/${restaurantId}/products/${productId}`
-  );
-
-  await updateDoc(productRef, {
-    available: true,
-    updatedAt: new Date(),
-  });
-}
-
-
+    await updateDoc(productRef, {
+      available: true,
+      updatedAt: new Date(),
+    });
+  }
 }

@@ -11,21 +11,20 @@
     </div>
   </div>
   <div class="actions">
-    <button mat-raised-button color="primary" (click)="editRestaurant()">
-      Editar Perfil
-    </button>
     <button mat-raised-button color="accent" (click)="goToMenu()">
       Administrar Menú
     </button>
 
-    <!-- <button mat-raised-button [color]="restaurant.enabled ? 'warn' : 'primary'">
-      {{ restaurant.enabled ? "Desactivar" : "Activar" }}
-    </button> -->
   </div>
 
   <div class="content-wrapper">
     <mat-card class="info-card">
-      <mat-card-title>Información del Restaurante</mat-card-title>
+      <div class="actions">
+        <mat-card-title>Información del Restaurante</mat-card-title>
+        <button mat-icon-button color="primary" (click)="editRestaurant()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
       <mat-card-content>
         <p>
           <strong>Descripción:</strong>
@@ -52,7 +51,11 @@
       </mat-card-content>
     </mat-card>
 
-    <app-product-list [products]="dataSource.data"></app-product-list>
+    <app-product-list
+      [products]="dataSource.data"
+      [restaurantId]="restaurant.restaurantId"
+      (productCreated)="createProductDialog()"
+    ></app-product-list>
 
     <mat-card class="stats-card">
       <mat-card-title>Estadísticas</mat-card-title>

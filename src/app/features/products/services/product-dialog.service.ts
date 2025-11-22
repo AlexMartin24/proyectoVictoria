@@ -14,37 +14,19 @@ export class ProductDialogService {
 
   constructor(private dialog: MatDialog) {}
 
-  openProductDialog(options: {
-    mode: DialogMode;
-    data?: Product;
-  }): Observable<Product> {
-    const dialogRef = this.dialog.open(ProductDialogComponent, {
-      disableClose: true,
-      width: '600px',
-      maxHeight: '90vh',
-      panelClass: 'custom-dialog-container',
-      hasBackdrop: true,
-      data: {
-        mode: options.mode,
-        restaurant:
-          options.mode === 'edit'
-            ? options.data
-            : {
+openProductDialog(options: { mode: DialogMode; data?: Product; }): Observable<Product> {
+  const dialogRef = this.dialog.open(ProductDialogComponent, {
+    disableClose: true,
+    width: '600px',
+    maxHeight: '90vh',
+    panelClass: 'custom-dialog-container',
+    hasBackdrop: true,
+    data: {
+      mode: options.mode,
+      product: options.data || undefined // <-- PASAR COMO product
+    },
+  });
 
-                productId: '',
-                name: '',
-                description: '',
-                price: 0,
-                available: false,
-                isOffer: false,
-                category: '',
-                enabled: false,
-                createdAt: new Date(),
-                updatedAt: new Date().toISOString(),
-              },
-      },
-    });
-
-    return dialogRef.afterClosed();
-  }
+  return dialogRef.afterClosed();
+}
 }

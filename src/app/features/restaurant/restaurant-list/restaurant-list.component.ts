@@ -1,90 +1,73 @@
 import {
   Component,
-  EventEmitter,
   Input,
   Output,
-  ViewChild,
-  OnInit,
-  AfterViewInit,
-  OnChanges,
+  EventEmitter,
   SimpleChanges,
+  ViewChild,
+  ChangeDetectorRef,
 } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { SharedModule } from '../../../shared/shared.module';
 import { Restaurant } from '../model/restaurant.model';
+import { SharedModule } from '../../../shared/shared.module';
+import { BaseTableComponent } from '../../../shared/components/base-table/base-table.component';
 
 @Component({
   selector: 'app-restaurant-list',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, BaseTableComponent],
   templateUrl: './restaurant-list.component.html',
   styleUrls: ['./restaurant-list.component.css'],
 })
-export class RestaurantListComponent
-  implements OnInit, AfterViewInit, OnChanges
-{
-  // Recibe la lista de restaurantes desde el padre
+export class RestaurantListComponent {
+  constructor(private cdr: ChangeDetectorRef) {}
+
   @Input() restaurants: Restaurant[] = [];
 
-  // Emitters para las acciones
   @Output() selectRestaurant = new EventEmitter<string>();
   @Output() edit = new EventEmitter<Restaurant>();
   @Output() remove = new EventEmitter<Restaurant>();
   @Output() enable = new EventEmitter<Restaurant>();
   @Output() disable = new EventEmitter<Restaurant>();
 
-  displayedColumns: string[] = [
-    'name',
-    'address',
-    'phone',
-    'enabled',
-    'actions',
-  ];
+  @ViewChild('tplEnabled', { static: true }) tplEnabled: any;
+  @ViewChild('tplAddress', { static: true }) tplAddress: any;
+  columns: any[] = [];
 
-  dataSource = new MatTableDataSource<Restaurant>();
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-
-  ngOnInit() {
-    this.dataSource.data = this.restaurants;
-  }
-
+  /** Columnas a mostrar */
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // Construimos las columnas después de que existan los templates
+    this.columns = [
+      { id: 'name', label: 'Nombre' },
+      { id: 'address', label: 'Dirección', template: this.tplAddress }, // asignamos template luego
+      { id: 'phone', label: 'Teléfono' },
+      { id: 'enabled', label: 'Activo', template: this.tplEnabled }, // este tiene Sí/No
+    ];
+
+    // 👈 ESTA LÍNEA SOLUCIONA EL ERROR NG0100
+    this.cdr.detectChanges();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['restaurants']) {
-      this.dataSource.data = this.restaurants;
-    }
-  }
-
-  applyFilter(event: Event) {
-    const value = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.dataSource.filter = value;
+    // BaseTable refresca solo con Inputs
   }
 
   onSelect(id: string) {
     this.selectRestaurant.emit(id);
   }
 
-  onEdit(restaurant: Restaurant) {
-    this.edit.emit(restaurant);
+  onEdit(r: Restaurant) {
+    this.edit.emit(r);
   }
 
-  onRemove(restaurant: Restaurant) {
-    this.remove.emit(restaurant);
+  onRemove(r: Restaurant) {
+    this.remove.emit(r);
   }
 
-  onEnable(restaurant: Restaurant) {
-    this.enable.emit(restaurant);
+  onEnable(r: Restaurant) {
+    this.enable.emit(r);
   }
 
-  onDisable(restaurant: Restaurant) {
-    this.disable.emit(restaurant);
+  onDisable(r: Restaurant) {
+    this.disable.emit(r);
   }
 }
