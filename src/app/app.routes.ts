@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 // import { LoginComponent } from './auth/login/login.component';
 import { FormComponent } from './auth/form/form.component';
-import { IndexComponent } from './core/components/index/index.component';
+import { IndexComponent } from './public/components/index/index.component';
 import { ListUserComponent } from './features/Users/list-user/list-user.component';
 import { ProductsComponent } from './features/products/products/products.component';
 import { RestaurantProfileComponent } from './features/restaurant/restaurant-profile/restaurant-profile.component';
@@ -29,7 +29,7 @@ export const routes: Routes = [
   // { path: '', component: ResourcesComponent },
 
 
-     { path: '', component: ProductListComponent },
+     { path: '', component: IndexComponent },
 
 
   {

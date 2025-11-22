@@ -101,6 +101,8 @@ export class RestaurantService {
     });
   }
 
+  /* ==================== READ RESTAURANTS BY STATUS ========================= */
+
   getRestaurantsByStatus(enabled: boolean): Observable<Restaurant[]> {
     const q = query(
       collection(this.firestore, 'restaurants'),

@@ -2,7 +2,7 @@
 mat-card {
   padding: 24px;
   margin: 20px auto;
-  max-width: 1200px;
+  max-width: 90%;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);

@@ -13,6 +13,7 @@ export interface Restaurant {
   slug: string; // ← slug para URLs
   membershipType: boolean; // Indica si el restaurante tiene membresía premium
   ownerId: string[]; // ID del usuario propietario del restaurante
+  category?: string; // Categoría del restaurante (ej. italiano, chino, etc.)
   createdAt: Date;
   updatedAt?: Date;
 }

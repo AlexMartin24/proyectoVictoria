@@ -1,14 +1,6 @@
 <div *ngIf="restaurant">
   <div class="restaurant-header">
     <img class="main-img" [src]="restaurant.mainImage" alt="Main Image" />
-    <div class="header-overlay">
-      <img class="logo" [src]="restaurant.imageLogo" alt="Logo" />
-      <div>
-        <h1>{{ restaurant.name }}</h1>
-        <p>{{ restaurant.address }} {{ restaurant.addressNumber }}</p>
-        <p>{{ restaurant.phone }}</p>
-      </div>
-    </div>
   </div>
   <div class="actions">
     <button mat-raised-button color="accent" (click)="goToMenu()">
@@ -18,38 +10,57 @@
   </div>
 
   <div class="content-wrapper">
-    <mat-card class="info-card">
-      <div class="actions">
-        <mat-card-title>Información del Restaurante</mat-card-title>
-        <button mat-icon-button color="primary" (click)="editRestaurant()">
-          <mat-icon>edit</mat-icon>
-        </button>
-      </div>
-      <mat-card-content>
-        <p>
-          <strong>Descripción:</strong>
-          {{ restaurant.description || "Sin descripción" }}
-        </p>
-        <p>
-          <strong>Estado:</strong>
-          <span [ngClass]="restaurant.enabled ? 'enabled' : 'disabled'">
-            {{ restaurant.enabled ? "Activo" : "Inactivo" }}
-          </span>
-        </p>
-        <p>
-          <strong>Horario:</strong>
-          {{ restaurant.openingHours || "No especificado" }}
-        </p>
-        <p>
-          <strong>Rating:</strong> ⭐ {{ restaurant.rating || "Sin calificar" }}
-        </p>
-        <p><strong>Creado:</strong> {{ restaurant.createdAt | date }}</p>
-        <p>
-          <strong>Última actualización:</strong>
-          {{ restaurant.updatedAt | date }}
-        </p>
-      </mat-card-content>
-    </mat-card>
+<mat-card class="info-card">
+  <!-- HEADER -->
+  <div class="info-card-header">
+    <img class="logo" [src]="restaurant.imageLogo" alt="Logo del restaurante" />
+
+    <div class="header-text">
+      <h1>{{ restaurant.name }}</h1>
+      <p>{{ restaurant.address }} {{ restaurant.addressNumber }}</p>
+      <p>{{ restaurant.phone }}</p>
+    </div>
+
+    <button mat-icon-button color="primary" class="edit-btn" (click)="editRestaurant()">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+
+  <!-- CARD CONTENT -->
+  <mat-card-content>
+    <div class="info-item">
+      <strong>Descripción:</strong>
+      <span>{{ restaurant.description || "Sin descripción" }}</span>
+    </div>
+
+    <div class="info-item">
+      <strong>Estado:</strong>
+      <span [ngClass]="restaurant.enabled ? 'enabled' : 'disabled'">
+        {{ restaurant.enabled ? "Activo" : "Inactivo" }}
+      </span>
+    </div>
+
+    <div class="info-item">
+      <strong>Horario:</strong>
+      <span>{{ restaurant.openingHours || "No especificado" }}</span>
+    </div>
+
+    <div class="info-item">
+      <strong>Rating:</strong>
+      <span>⭐ {{ restaurant.rating || "Sin calificar" }}</span>
+    </div>
+
+    <div class="info-item">
+      <strong>Creado:</strong>
+      <span>{{ restaurant.createdAt | date }}</span>
+    </div>
+
+    <div class="info-item">
+      <strong>Última actualización:</strong>
+      <span>{{ restaurant.updatedAt | date }}</span>
+    </div>
+  </mat-card-content>
+</mat-card>
 
     <app-product-list
       [products]="dataSource.data"

@@ -1,12 +1,38 @@
-.restaurant-header {
-  position: relative;
-  width: 100%;
-  height: 250px;
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: 20px;
+/* Card principal */
+.info-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Header del card */
+.info-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+/* Logo */
+.info-card-header .logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+}
+
+/* Texto del header */
+.header-text {
+  flex: 1;
+}
 .main-img {
   width: 100%;
   height: 100%;
@@ -14,54 +40,34 @@
   filter: brightness(0.7);
 }
 
-.header-overlay {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-  background-color: rgba(0, 0, 0, 0.4);
-  width: fit-content;
+.header-text h1 {
+  margin: 0 0 4px 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
 }
 
-.logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid white;
-  object-fit: cover;
+.header-text p {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  color: #555;
 }
 
-.content-wrapper {
+/* Botón editar */
+.edit-btn {
+  align-self: flex-start;
+}
+
+/* Contenido del card */
+mat-card-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 0 16px; /* margen lateral */
+  gap: 12px;
 }
 
-.info-card,
-.stats-card {
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
-  margin-top: 10px;
-}
-
-.stat-box {
-  background: #f5f5f5;
-  padding: 16px;
-  border-radius: 12px;
-  text-align: center;
+.info-item strong {
+  font-weight: 600;
+  margin-right: 6px;
 }
 
 .enabled {
@@ -81,18 +87,65 @@
   margin: 20px 0;
   justify-content: space-around;
 }
+.info-card,
+.stats-card {
+  padding: 24px;
+  margin: 20px auto;
+  max-width: 90%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
 
+  background: #fff;
+  max-width: 90%;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.stat-box {
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
+  .info-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .edit-btn {
+    align-self: flex-end;
+  }
+
   .logo {
     width: 60px;
     height: 60px;
   }
 
-  .restaurant-header {
-    height: 180px;
+  .header-text h1 {
+    font-size: 1.2rem;
+  }
+}
+@media (max-width: 400px) {
+  .info-card {
+    padding: 15px;
   }
 
-  .header-overlay h1 {
-    font-size: 1.2rem;
+  .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  .header-text h1 {
+    font-size: 1rem;
   }
 }
