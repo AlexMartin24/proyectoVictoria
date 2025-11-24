@@ -7,11 +7,11 @@ import {
 } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
-import { UserCredentials } from '../../../admin/users/model/user.model';
 import { RegisterDialogComponent } from '../register-dialog/register-dialog.component';
 import { ResetPasswordDialogComponent } from '../reset-password-dialog/reset-password-dialog.component';
 import { AuthService } from '../../services/auth.service';
 import { DialogService } from '../../../core/services/dialog.service';
+import { UserCredentials } from '../../../users/model/user.model';
 
 @Component({
   selector: 'app-login-dialog',

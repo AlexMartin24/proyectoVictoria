@@ -18,7 +18,7 @@ import { BehaviorSubject } from 'rxjs';
 import { regexMail } from '../../shared/pattern/patterns';
 import { FirebaseError } from 'firebase/app';
 import { ErrorHandlerService } from '../../core/services/error-handler.service';
-import { User, UserCredentials } from '../../admin/users/model/user.model';
+import { User, UserCredentials } from '../../users/model/user.model';
 
 @Injectable({
   providedIn: 'root',

@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { AuthService } from './auth.service';
 import { MatDialog } from '@angular/material/dialog';
-import { SessionTimeoutDialogComponent } from '../dialog/session-timeout-dialog/session-timeout-dialog.component';
+import { SessionTimeoutDialogComponent } from '../components/session-timeout-dialog/session-timeout-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class IdleService {
