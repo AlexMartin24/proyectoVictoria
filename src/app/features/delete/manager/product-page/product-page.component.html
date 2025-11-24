@@ -1,0 +1,19 @@
+<mat-toolbar [color]="showDisabledTable ? 'warn' : 'primary'" class="toolbar-header">
+  <span class="header-title">
+    {{ showDisabledTable ? "Productos Deshabilitados" : "Productos Habilitados" }}
+  </span>
+  <span class="spacer"></span>
+
+  <button mat-flat-button class="toggle-btn" (click)="toggleProductTableView()">
+    <mat-icon>{{ showDisabledTable ? "visibility" : "visibility_off" }}</mat-icon>
+    {{ showDisabledTable ? "Ver habilitados" : "Ver deshabilitados" }}
+  </button>
+</mat-toolbar>
+
+<app-product-list
+  [products]="products"
+  (edit)="onEdit($event)"
+  (remove)="onRemove($event)"
+  (enable)="onEnable($event)"
+  (create)="onCreate()"
+></app-product-list>

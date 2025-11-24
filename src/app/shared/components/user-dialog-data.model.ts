@@ -1,4 +1,4 @@
-import { User } from "../../features/Users/model/user.model";
+import { User } from "../../admin/users/model/user.model";
 
 export type UserDialogMode = 'registro' | 'editar-perfil' | 'editar-usuario';
 

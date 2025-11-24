@@ -8,8 +8,8 @@ export class IdleService {
   private timeout!: any;
   private warningTimeout!: any;
 
-  private readonly MAX_IDLE_TIME = 10 * 60 * 1000; // Tiempo de inactividad: 10 minutos
-  private readonly WARNING_TIME = 30 * 1000; // 30 seg antes del logout
+  private readonly MAX_IDLE_TIME = 10 * 60 * 1000; // 10 minutos
+  private readonly WARNING_TIME = 30 * 1000; // 30 segundos antes del logout
 
   constructor(
     private auth: AuthService,
@@ -29,23 +29,53 @@ export class IdleService {
   }
 
   resetTimer() {
-    this.ngZone.runOutsideAngular(() => {
-      if (this.timeout) clearTimeout(this.timeout);
-      if (this.warningTimeout) clearTimeout(this.warningTimeout);
+    // Verificar que hay sesión activa
+    if (!this.auth.isLoggedIn) {
+      this.clearTimers();
+      return;
+    }
 
-      // Mostrar advertencia 30 segundos antes
+    const now = Date.now();
+    localStorage.setItem('lastActivity', now.toString());
+
+    this.ngZone.runOutsideAngular(() => {
+      this.clearTimers();
+
+      const last = Number(localStorage.getItem('lastActivity')) || now;
+      const elapsed = now - last;
+      const remaining = this.MAX_IDLE_TIME - elapsed;
+
+      if (remaining <= 0) {
+        this.ngZone.run(() => this.auth.logout());
+        return;
+      }
+
+      // Mostrar advertencia 30s antes
       this.warningTimeout = setTimeout(() => {
         this.ngZone.run(() => this.showWarning());
-      }, this.MAX_IDLE_TIME - this.WARNING_TIME);
+      }, remaining - this.WARNING_TIME);
 
       // Logout cuando se cumple el tiempo total
       this.timeout = setTimeout(() => {
         this.ngZone.run(() => this.auth.logout());
-      }, this.MAX_IDLE_TIME);
+      }, remaining);
     });
   }
 
+  private clearTimers() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = undefined;
+    }
+    if (this.warningTimeout) {
+      clearTimeout(this.warningTimeout);
+      this.warningTimeout = undefined;
+    }
+  }
+
   private showWarning() {
+    if (!this.auth.isLoggedIn) return;
+
     const dialogRef = this.dialog.open(SessionTimeoutDialogComponent, {
       width: '350px',
       disableClose: true,
@@ -58,20 +88,15 @@ export class IdleService {
       counter--;
       dialogRef.componentInstance.data.seconds = counter;
 
-      // Forzar cierre cuando llega a 0
       if (counter <= 0) {
         clearInterval(interval);
-
-        if (dialogRef) {
-          dialogRef.close(false); // forza cierre
-        }
+        dialogRef.close(false);
       }
     }, 1000);
+
     dialogRef.afterClosed().subscribe((result) => {
       clearInterval(interval);
-
       if (result) {
-        // Usuario quiere seguir conectado
         this.resetTimer();
       } else {
         this.auth.logout();

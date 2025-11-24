@@ -1,0 +1,102 @@
+<div *ngIf="restaurant">
+  <!-- 🟩 PORTADA DEL RESTAURANTE (solo imagen + overlay visual) -->
+  <div class="restaurant-header">
+    <img class="main-img" [src]="restaurant.mainImage" alt="Imagen principal" />
+  </div>
+
+  <!-- Contenido -->
+  <div class="content-wrapper">
+    <!-- Info principal -->
+    <mat-card class="info-card">
+      <!-- 🔥 Header como antes: logo + título + dirección + botón editar -->
+      <div class="info-card-header">
+        <img
+          class="logo"
+          [src]="restaurant.imageLogo"
+          alt="Logo del restaurante"
+        />
+
+        <div class="header-text">
+          <h1>{{ restaurant.name }}</h1>
+          <p>{{ restaurant.address }} {{ restaurant.addressNumber }}</p>
+          <p>{{ restaurant.phone }}</p>
+        </div>
+
+        <button
+          mat-icon-button
+          color="primary"
+          class="edit-btn"
+          (click)="editRestaurant()"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+
+      <mat-card-content>
+        <div class="info-item">
+          <strong>Descripción:</strong>
+          <span>{{ restaurant.description || "Sin descripción" }}</span>
+        </div>
+
+        <div class="info-item">
+          <strong>Estado:</strong>
+          <span [ngClass]="restaurant.enabled ? 'enabled' : 'disabled'">
+            {{ restaurant.enabled ? "Activo" : "Inactivo" }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <strong>Horario:</strong>
+          <span>{{ restaurant.openingHours || "No especificado" }}</span>
+        </div>
+
+        <div class="info-item">
+          <strong>Rating:</strong>
+          <span>⭐ {{ restaurant.rating || "Sin calificar" }}</span>
+        </div>
+
+        <div class="info-item">
+          <strong>Creado:</strong>
+          <span>{{ restaurant.createdAt | date }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Lista de productos -->
+    <app-product-list
+      [products]="dataSource.data"
+      [restaurantId]="restaurant.restaurantId"
+      (create)="createProduct()"
+      (edit)="editProduct($event)"
+    ></app-product-list>
+
+    <!-- Stats -->
+    <mat-card class="stats-card">
+      <mat-card-title>Estadísticas</mat-card-title>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h2>⭐ {{ restaurant.rating || 0 }}</h2>
+          <p>Rating promedio</p>
+        </div>
+        <div class="stat-box">
+          <h2>{{ totalMenuItems }}</h2>
+          <p>Platos cargados</p>
+
+          <div class="actions">
+            <button mat-raised-button color="accent" (click)="goToMenu()">
+              Administrar Menú
+            </button>
+          </div>
+        </div>
+        <div class="stat-box">
+          <h2>{{ totalComments }}</h2>
+          <p>Comentarios</p>
+        </div>
+        <div class="stat-box">
+          <h2>{{ monthlyViews }}</h2>
+          <p>Vistas del mes</p>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

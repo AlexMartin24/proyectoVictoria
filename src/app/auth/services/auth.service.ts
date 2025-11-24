@@ -14,11 +14,11 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { regexMail } from '../../shared/pattern/patterns';
 import { FirebaseError } from 'firebase/app';
 import { ErrorHandlerService } from '../../core/services/error-handler.service';
-import { User, UserCredentials } from '../../features/Users/model/user.model';
+import { User, UserCredentials } from '../../admin/users/model/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -55,9 +55,12 @@ export class AuthService {
     });
   }
 
-  // ----------------------------------------------------------------------
-  // LOGIN EMAIL/PASSWORD
-  // ----------------------------------------------------------------------
+  // -------------------- GETTER PÚBLICO --------------------
+  get isLoggedIn(): boolean {
+    return this.isLoggedInSubject.value;
+  }
+
+  // -------------------- LOGIN EMAIL/PASSWORD --------------------
   async login({ email, password }: UserCredentials) {
     try {
       return await signInWithEmailAndPassword(this.auth, email, password);
@@ -66,9 +69,7 @@ export class AuthService {
     }
   }
 
-  // ----------------------------------------------------------------------
-  // LOGIN GOOGLE
-  // ----------------------------------------------------------------------
+  // -------------------- LOGIN GOOGLE --------------------
   async loginWithGoogle() {
     try {
       const credentials = await signInWithPopup(
@@ -77,18 +78,16 @@ export class AuthService {
       );
       const user = credentials.user;
 
-      // Extraer nombre y apellido
       const displayName = user.displayName ?? '';
       const [name = '', lastname = ''] = displayName.split(' ');
 
-      // Guardar / actualizar datos del user
       await this.saveUser(user.uid, {
         uid: user.uid,
         email: user.email ?? '',
         name,
         lastname,
         photoURL: user.photoURL ?? '',
-        role: 'user', // DEFAULT
+        role: 'user',
         enabled: true,
         createdAt: new Date().toISOString(),
       });
@@ -99,9 +98,7 @@ export class AuthService {
     }
   }
 
-  // ----------------------------------------------------------------------
-  // REGISTER EMAIL/PASSWORD
-  // ----------------------------------------------------------------------
+  // -------------------- REGISTER --------------------
   async registerUser({ name, lastname, email, password }: any) {
     const cred = await createUserWithEmailAndPassword(
       this.auth,
@@ -122,48 +119,41 @@ export class AuthService {
 
     return user.uid;
   }
-  // ----------------------------------------------------------------------
-  // GET CURRENT USER
-  // ----------------------------------------------------------------------
+
+  // -------------------- GET USER DATA --------------------
   async getUserData(userId: string): Promise<User | null> {
     const userRef = doc(this.firestore, `users/${userId}`);
     const snap = await getDoc(userRef);
     return snap.exists() ? (snap.data() as User) : null;
   }
 
-  // ----------------------------------------------------------------------
-  // SAVE USER DATA (UNIFICADO)
-  // ----------------------------------------------------------------------
+  // -------------------- SAVE USER DATA --------------------
   async saveUser(uid: string, data: Partial<User>) {
     const userRef = doc(this.firestore, `users/${uid}`);
     return setDoc(userRef, { uid, ...data }, { merge: true });
   }
 
-  // ----------------------------------------------------------------------
-  // LOGOUT
-  // ----------------------------------------------------------------------
+  // -------------------- LOGOUT --------------------
   async logout() {
     await signOut(this.auth);
     this.isLoggedInSubject.next(false);
     this.currentUserSubject.next(null);
+    localStorage.removeItem('lastActivity');
   }
 
-/** ----------------------------------------------------------------------
- * RESET CONTRASEÑA
- * Envía email con link de recuperación (Firebase)
- * ---------------------------------------------------------------------- */
+  // -------------------- RESET PASSWORD --------------------
   async sendPasswordReset(email: string): Promise<void> {
     try {
       await sendPasswordResetEmail(this.auth, email);
     } catch (error: any) {
       console.error('Error al enviar email de reset:', error);
-      throw new Error('No pudimos enviar el email. Revisá que el correo esté registrado.');
+      throw new Error(
+        'No pudimos enviar el email. Revisá que el correo esté registrado.'
+      );
     }
   }
 
-  // ----------------------------------------------------------------------
-  // UTILS
-  // ----------------------------------------------------------------------
+  // -------------------- UTILITIES --------------------
   private validateEmail(email: string): boolean {
     const regex = new RegExp(regexMail);
     return regex.test(email);
