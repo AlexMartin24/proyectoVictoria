@@ -6,8 +6,6 @@ import { IndexComponent } from './customer/components/index/index.component';
 export const routes: Routes = [
   { path: 'form', component: FormComponent },
 
-
-  
   {
     path: 'cart',
     loadComponent: () =>
@@ -16,15 +14,12 @@ export const routes: Routes = [
       ),
   },
 
-  // { path: '', component: ResourcesComponent },
-
-
-     { path: '', component: IndexComponent },
-
+  { path: '', component: IndexComponent },
 
   {
     path: 'auth',
-    loadChildren: () => import('./auth/routes/auth.routes').then((m) => m.AUTH_ROUTES),
+    loadChildren: () =>
+      import('./auth/routes/auth.routes').then((m) => m.AUTH_ROUTES),
   },
 
   {

@@ -47,4 +47,11 @@ export class DialogService {
   questionDialog(title: string, message: string) {
     return this.confirmDialog({ title, message, type: 'question' });
   }
+  promptDialog(config: { title?: string; message?: string }): Promise<string | null> {
+  return new Promise(resolve => {
+    const result = prompt(`${config.title ?? ''}\n${config.message ?? ''}`);
+    resolve(result && result.trim() !== '' ? result : null);
+  });
+}
+
 }

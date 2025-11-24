@@ -60,7 +60,7 @@ export class FormComponent implements OnInit {
           this.firstUserForm.patchValue({
             name: userData.name,
             lastname: userData.lastname,
-            role: userData.role,
+            roles: userData.roles,
           });
 
           this.secondUserForm.patchValue({

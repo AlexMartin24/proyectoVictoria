@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { Product, PRODUCT_CATEGORIES } from '../model/product.model';
+import { Product, PRODUCT_CATEGORIES } from '../../model/product.model';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute } from '@angular/router';
-import { ProductService } from '../services/product.service';
-import { SharedModule } from '../../shared/shared.module';
-import { CartComponent } from '../../customer/components/cart/cart.component';
-import { Restaurant } from '../../restaurant/model/restaurant.model';
-import { RestaurantService } from '../../restaurant/services/restaurant.service';
+import { ProductService } from '../../services/product.service';
+import { SharedModule } from '../../../shared/shared.module';
+import { CartComponent } from '../../../customer/components/cart/cart.component';
+import { Restaurant } from '../../../restaurant/model/restaurant.model';
+import { RestaurantService } from '../../../restaurant/services/restaurant.service';
 
 @Component({
   selector: 'app-products',
@@ -27,7 +27,8 @@ export class ProductsComponent implements OnInit {
   categories: { label: string; products$: Observable<Product[]> }[] = [];
   // Pestaña de ofertas
   offerProducts$!: Observable<Product[]>;
-restaurant: Restaurant | null = null;
+  restaurant: Restaurant | null = null;
+  restaurant$!: Observable<Restaurant>;
 
   constructor(
     private productsService: ProductService,
@@ -52,7 +53,7 @@ restaurant: Restaurant | null = null;
       .subscribe((restaurant) => {
         if (!restaurant) return;
 
-        this.restaurant = restaurant;  // <-- ya puedes usar name, description, etc.
+        this.restaurant = restaurant; // <-- ya puedes usar name, description, etc.
 
         const restaurantId = restaurant.restaurantId!;
         // Inicializar categorías
@@ -70,18 +71,31 @@ restaurant: Restaurant | null = null;
   }
 
   addProductToCart(product: Product) {
+    const finalPrice = this.getFinalPrice(product);
+
     const item = this.cartItems.find(
       (ci) => ci.product.productId === product.productId
     );
+
     if (item) {
       item.quantity += 1;
     } else {
-      this.cartItems.push({ product, quantity: 1 });
+      // Guardamos el precio final para que no cambie si luego editás la oferta
+      this.cartItems.push({
+        product: { ...product, price: finalPrice },
+        quantity: 1,
+      });
     }
   }
 
   getCartQuantity(): number {
     return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  getFinalPrice(product: Product): number {
+    return product.isOffer && product.offerPrice != null
+      ? product.offerPrice
+      : product.price;
   }
 
   openImageModal(imageUrl: string | undefined) {

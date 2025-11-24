@@ -79,7 +79,9 @@ export class AuthService {
       const user = credentials.user;
 
       const displayName = user.displayName ?? '';
-      const [name = '', lastname = ''] = displayName.split(' ');
+      const names = displayName.split(' ');
+      const name = names.shift() || '';
+      const lastname = names.join(' ') || '';
 
       await this.saveUser(user.uid, {
         uid: user.uid,
@@ -87,9 +89,19 @@ export class AuthService {
         name,
         lastname,
         photoURL: user.photoURL ?? '',
-        role: 'user',
+        roles: {
+          adminGlobal: false,
+          adminLocal: false,
+          mozo: false,
+          cocina: false,
+          gerencia: false,
+          customer: true,
+          guest: false,
+        },
+        restaurantsOwner: [],
+        restaurantsStaff: [],
         enabled: true,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       });
 
       return { uid: user.uid };
@@ -112,9 +124,19 @@ export class AuthService {
       email,
       name,
       lastname,
-      role: 'user',
+      roles: {
+        adminGlobal: false,
+        adminLocal: false,
+        mozo: false,
+        cocina: false,
+        gerencia: false,
+        customer: true,
+        guest: false,
+      },
+      restaurantsOwner: [],
+      restaurantsStaff: [],
       enabled: true,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     });
 
     return user.uid;
@@ -140,6 +162,12 @@ export class AuthService {
     this.currentUserSubject.next(null);
     localStorage.removeItem('lastActivity');
   }
+
+    // -------------------- GET USER LOGUEADO --------------------
+  getCurrentUser(): Promise<User | null> {
+  return Promise.resolve(this.currentUserSubject.value);
+}
+
 
   // -------------------- RESET PASSWORD --------------------
   async sendPasswordReset(email: string): Promise<void> {

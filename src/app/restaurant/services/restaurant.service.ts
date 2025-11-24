@@ -72,8 +72,8 @@ export class RestaurantService {
       ...data,
       restaurantId: docRef.id,
       slug,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     } as Restaurant;
   }
 

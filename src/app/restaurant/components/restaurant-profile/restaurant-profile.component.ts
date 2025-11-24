@@ -11,11 +11,12 @@ import { ProductService } from '../../../products/services/product.service';
 import { Restaurant } from '../../model/restaurant.model';
 import { RestaurantDialogService } from '../../services/restaurant-dialog.service';
 import { RestaurantService } from '../../services/restaurant.service';
+import { StaffManagementComponent } from '../../../staff/staff-management/staff-management.component';
 
 @Component({
   selector: 'app-restaurant-profile',
   standalone: true,
-  imports: [SharedModule, ProductListComponent],
+  imports: [SharedModule, ProductListComponent, StaffManagementComponent],
   templateUrl: './restaurant-profile.component.html',
   styleUrl: './restaurant-profile.component.css',
 })

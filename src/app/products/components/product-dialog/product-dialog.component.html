@@ -9,7 +9,7 @@
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>Nombre</mat-label>
         <input matInput formControlName="name" autocomplete="off" />
-        <mat-error *ngIf="editForm.controls['name'].hasError('required')">
+        <mat-error *ngIf="editForm.get('name')?.hasError('required')">
           El campo es requerido
         </mat-error>
       </mat-form-field>
@@ -21,7 +21,7 @@
             {{ c }}
           </mat-option>
         </mat-select>
-        <mat-error *ngIf="editForm.controls['category'].hasError('required')">
+        <mat-error *ngIf="editForm.get('category')?.hasError('required')">
           La categoría es obligatoria
         </mat-error>
       </mat-form-field>
@@ -32,10 +32,10 @@
       <mat-form-field appearance="outline" class="form-field">
         <mat-label>Precio</mat-label>
         <input matInput type="number" formControlName="price" />
-        <mat-error *ngIf="editForm.controls['price'].hasError('required')">
+        <mat-error *ngIf="editForm.get('price')?.hasError('required')">
           El campo es requerido
         </mat-error>
-        <mat-error *ngIf="editForm.controls['price'].hasError('min')">
+        <mat-error *ngIf="editForm.get('price')?.hasError('min')">
           El precio no puede ser negativo
         </mat-error>
       </mat-form-field>
@@ -48,6 +48,7 @@
         </mat-select>
       </mat-form-field>
 
+      <!-- Precio de oferta -->
       <mat-form-field
         appearance="outline"
         class="form-field"
@@ -55,11 +56,19 @@
       >
         <mat-label>Precio de oferta</mat-label>
         <input matInput type="number" formControlName="offerPrice" />
-        <mat-error *ngIf="editForm.controls['offerPrice'].hasError('min')">
-          El precio no puede ser negativo
+
+        <!-- Errores del validador de grupo -->
+        <mat-error *ngIf="editForm.errors?.['offerRequired']">
+          Debes ingresar un precio de oferta
         </mat-error>
-        <mat-error *ngIf="editForm.controls['offerPrice'].hasError('invalidOffer')">
+
+        <mat-error *ngIf="editForm.errors?.['invalidOffer']">
           El precio de oferta debe ser menor al precio normal
+        </mat-error>
+
+        <!-- Error local del control -->
+        <mat-error *ngIf="editForm.get('offerPrice')?.hasError('min')">
+          El precio no puede ser negativo
         </mat-error>
       </mat-form-field>
     </div>

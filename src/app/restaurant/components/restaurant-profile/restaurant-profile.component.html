@@ -62,6 +62,9 @@
       </mat-card-content>
     </mat-card>
 
+    <app-staff-management [restaurantId]="restaurant.restaurantId">
+    </app-staff-management>
+
     <!-- Lista de productos -->
     <app-product-list
       [products]="dataSource.data"

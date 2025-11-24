@@ -1,21 +1,36 @@
 export interface Restaurant {
   restaurantId: string;
   name: string;
+  
+  // Dirección simple (MVP)
   address: string;
   addressNumber: number;
+
   description?: string;
   imageLogo?: string;
   mainImage?: string;
   phone?: string;
-  rating?: number; // Calificación promedio del restaurante
-  enabled: boolean; // Indica si el restaurante está activo o no
-  openingHours?: string; // Horario de apertura
-  slug: string; // ← slug para URLs
-  membershipType: boolean; // Indica si el restaurante tiene membresía premium
-  ownerId: string[]; // ID del usuario propietario del restaurante
-  category?: string; // Categoría del restaurante (ej. italiano, chino, etc.)
-  createdAt: Date;
-  updatedAt?: Date;
+
+  slug: string; // URL amigable
+
+  enabled: boolean; // Para cambiar estado sin borrar
+
+  // Membresía (REEMPLAZADO - no boolean)
+  membershipPlan: 'free' | 'premium'; 
+
+  // Relación con dueños
+  ownerIds: string[]; // UIDs de usuarios dueños
+
+  // Data adicional
+  category?: string;
+  openingHours?: string;
+
+  // Para valoraciones futuras
+  rating?: number;
+
+  // Timestamps
+  createdAt: string;  // ISO string
+  updatedAt?: string; // ISO string cargado por acción
 }
 
 export type RestaurantDialogMode = 'edit' | 'create';

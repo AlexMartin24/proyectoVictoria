@@ -13,7 +13,10 @@
         <div class="title-container">
           <h1 class="title">🍽️ Nuestra Carta</h1>
           <p class="subtitle">
-            {{ restaurant?.description || "Bienvenido a nuestro menú" }}
+            {{ restaurant?.name || "Bienvenido a nuestro menú" }}
+          </p>
+          <p class="subtitle">
+            {{ restaurant?.description || "Mira nuestras opciones" }}
           </p>
         </div>
         <button
@@ -56,9 +59,25 @@
                   <div class="text-section">
                     <h2>{{ item.name }}</h2>
                     <p>{{ item.description }}</p>
-                    <span class="price">{{
-                      item.price | currency : "USD"
-                    }}</span>
+                    <div class="price-wrapper">
+                      <!-- Si está en oferta -->
+                      <ng-container *ngIf="item.isOffer; else normalPrice">
+                        <span class="old-price">
+                          {{ item.price | currency : "USD" }}
+                        </span>
+
+                        <span class="offer-price">
+                          {{ item.offerPrice | currency : "USD" }}
+                        </span>
+                      </ng-container>
+
+                      <!-- Precio normal -->
+                      <ng-template #normalPrice>
+                        <span class="price-normal">
+                          {{ item.price | currency : "USD" }}
+                        </span>
+                      </ng-template>
+                    </div>
                     <div class="button-wrapper">
                       <button
                         mat-raised-button
@@ -99,9 +118,23 @@
                   <div class="text-section">
                     <h2>{{ item.name }}</h2>
                     <p>{{ item.description }}</p>
-                    <span class="price">{{
-                      item.price | currency : "USD"
-                    }}</span>
+                    <div class="price-wrapper">
+                      <ng-container *ngIf="item.isOffer; else normalPriceCat">
+                        <span class="old-price">
+                          {{ item.price | currency : "USD" }}
+                        </span>
+
+                        <span class="offer-price">
+                          {{ item.offerPrice | currency : "USD" }}
+                        </span>
+                      </ng-container>
+
+                      <ng-template #normalPriceCat>
+                        <span class="price-normal">
+                          {{ item.price | currency : "USD" }}
+                        </span>
+                      </ng-template>
+                    </div>
                     <div class="button-wrapper">
                       <button
                         mat-raised-button
