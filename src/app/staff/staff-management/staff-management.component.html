@@ -7,6 +7,16 @@
     </button>
   </div>
 
+  <!-- 🔥 TEMPLATE PARA ROLES -->
+  <ng-template #rolesTemplate let-user>
+    <mat-chip-set>
+      <mat-chip *ngFor="let r of user.rolesList" color="primary" selected>
+        {{ r }}
+      </mat-chip>
+    </mat-chip-set>
+  </ng-template>
+
+  <!-- TABLA BASE -->
   <app-base-table
     [columns]="columns"
     [data]="staff"
@@ -14,7 +24,7 @@
     filterPlaceholder="Buscar empleado..."
   ></app-base-table>
 
-  <!-- ACCIONES PARA CADA FILA -->
+  <!-- ACCIONES DE FILA -->
   <ng-template #actionsTemplate let-user>
     <div class="actions">
       <button mat-icon-button color="primary" (click)="changeRole(user)">

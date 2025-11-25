@@ -117,3 +117,14 @@
     font-size: 1.2rem;
   }
 }
+.section-header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 20px 0 10px;
+}
+
+.add-bar {
+  text-align: center;
+  margin: 20px 0;
+}

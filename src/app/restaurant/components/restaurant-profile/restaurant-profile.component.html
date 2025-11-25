@@ -65,11 +65,19 @@
     <app-staff-management [restaurantId]="restaurant.restaurantId">
     </app-staff-management>
 
+    <div class="section-header">
+      <h2>Productos</h2>
+
+      <button mat-stroked-button color="primary" (click)="createProduct()">
+        <mat-icon>add</mat-icon>
+        Agregar Producto
+      </button>
+    </div>
+
     <!-- Lista de productos -->
     <app-product-list
       [products]="dataSource.data"
       [restaurantId]="restaurant.restaurantId"
-      (create)="createProduct()"
       (edit)="editProduct($event)"
     ></app-product-list>
 
@@ -77,7 +85,7 @@
     <mat-card class="stats-card">
       <mat-card-title>Estadísticas</mat-card-title>
       <div class="stats-grid">
-        <div class="stat-box">
+        <div class="stat-box">  
           <h2>⭐ {{ restaurant.rating || 0 }}</h2>
           <p>Rating promedio</p>
         </div>

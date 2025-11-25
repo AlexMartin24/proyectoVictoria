@@ -5,9 +5,10 @@ import {
   TemplateRef,
   ViewChild,
   Input,
+  OnChanges,
 } from '@angular/core';
 import { SharedModule } from '../../shared/shared.module';
-import { User } from '../../users/model/user.model'; // ✔️ CORRECTO
+import { User } from '../../users/model/user.model';
 import { AuthService } from '../../auth/services/auth.service';
 import { DialogService } from '../../core/services/dialog.service';
 import {
@@ -17,15 +18,16 @@ import {
 import { UserService } from '../../users/services/user.service';
 import { UserDialogComponent } from '../../users/components/user-dialog/user-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-staff-management',
   standalone: true,
-  imports: [SharedModule, BaseTableComponent],
+  imports: [SharedModule, BaseTableComponent,MatChipsModule ],
   templateUrl: './staff-management.component.html',
   styleUrl: './staff-management.component.css',
 })
-export class StaffManagementComponent implements OnInit {
+export class StaffManagementComponent implements OnInit, OnChanges {
   private userService = inject(UserService);
   private dialogService = inject(DialogService);
   private dialog: MatDialog = inject(MatDialog);
@@ -35,16 +37,23 @@ export class StaffManagementComponent implements OnInit {
 
   staff: User[] = [];
 
+  // 🔥 Las columnas con template para roles
   columns: BaseColumn[] = [
     { id: 'fullname', label: 'Nombre' },
     { id: 'email', label: 'Email' },
-    { id: 'role', label: 'Rol' },
+    { id: 'roles', label: 'Roles', template: null }, // Usará rolesTemplate
   ];
 
   @ViewChild('actionsTemplate', { static: true })
   actionsTemplate!: TemplateRef<any>;
 
+  @ViewChild('rolesTemplate', { static: true })
+  rolesTemplate!: TemplateRef<any>;
+
   ngOnInit() {
+    // asignar template a columna roles
+    this.columns.find((c) => c.id === 'roles')!.template = this.rolesTemplate;
+
     this.loadStaff();
   }
 
@@ -63,17 +72,11 @@ export class StaffManagementComponent implements OnInit {
       this.staff = users.map((u) => ({
         ...u,
         fullname: `${u.lastname} ${u.name}`,
-        role: this.getUserRole(u),
+        rolesList: Object.keys(u.roles || {}).filter((r) => (u.roles as Record<string, boolean>)[r]) || [
+          'Sin rol',
+        ],
       }));
     });
-  }
-  private getUserRole(user: User): string {
-    if (!user.roles) return 'Sin rol';
-    return (
-      Object.keys(user.roles).find(
-        (r) => user.roles[r as keyof typeof user.roles] === true
-      ) ?? 'Sin rol'
-    );
   }
 
   toggleDisabled() {
@@ -92,6 +95,7 @@ export class StaffManagementComponent implements OnInit {
         if (ok && user.uid) {
           await this.userService.disableStaffMember(user.uid);
           this.dialogService.infoDialog('OK', 'Empleado deshabilitado.');
+          this.loadStaff();
         }
       });
   }
@@ -107,6 +111,7 @@ export class StaffManagementComponent implements OnInit {
         if (ok && user.uid) {
           await this.userService.enableStaffMember(user.uid);
           this.dialogService.infoDialog('OK', 'Empleado habilitado.');
+          this.loadStaff();
         }
       });
   }
@@ -122,6 +127,6 @@ export class StaffManagementComponent implements OnInit {
 
     await this.userService.updateUser(user.uid, { roles: result.roles });
     this.dialogService.infoDialog('OK', 'Roles actualizados correctamente.');
-    this.loadStaff(); // recargar tabla
+    this.loadStaff();
   }
 }
