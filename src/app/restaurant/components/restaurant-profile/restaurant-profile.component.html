@@ -1,7 +1,7 @@
 <div *ngIf="restaurant">
   <!-- 🟩 PORTADA DEL RESTAURANTE (solo imagen + overlay visual) -->
   <div class="restaurant-header">
-    <img class="main-img" [src]="restaurant.mainImage" alt="Imagen principal" />
+    <img class="main-img" [src]="restaurant.mainImage || 'assets/img/not-found.png'" alt="Imagen principal" />
   </div>
 
   <!-- Contenido -->
@@ -12,7 +12,7 @@
       <div class="info-card-header">
         <img
           class="logo"
-          [src]="restaurant.imageLogo"
+          [src]="restaurant.imageLogo || 'assets/img/not-found.png'"
           alt="Logo del restaurante"
         />
 
@@ -85,7 +85,7 @@
     <mat-card class="stats-card">
       <mat-card-title>Estadísticas</mat-card-title>
       <div class="stats-grid">
-        <div class="stat-box">  
+        <div class="stat-box">
           <h2>⭐ {{ restaurant.rating || 0 }}</h2>
           <p>Rating promedio</p>
         </div>

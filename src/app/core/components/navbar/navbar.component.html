@@ -1,58 +1,77 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Proyecto Victoria</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">Proyecto Victoria</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- Home siempre visible -->
+        <li class="nav-item">
+          <a class="nav-link active" routerLink="/">Home</a>
+        </li>
+
+        <!-- Usuario logueado -->
+        <ng-container *ngIf="isLoggedIn$ | async; else notLoggedIn">
+          <!-- Perfil siempre visible -->
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link" routerLink="users/profile">Mi Perfil</a>
           </li>
 
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <!-- Dashboard solo si es admin -->
+          <li
+            class="nav-item dropdown"
+            *ngIf="
+              currentUser?.roles?.adminGlobal || currentUser?.roles?.adminLocal
+            "
+          >
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
               Tu Dashboard
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/restaurant">Perfil</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/menu">Menú</a>
-              <!-- <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/alumnos">Alumnos</a> -->
+              <li>
+                <a class="dropdown-item" routerLink="/restaurant">Locales</a>
+              </li>
+              <li><a class="dropdown-item" routerLink="/menu">Menú</a></li>
             </ul>
           </li>
+        </ng-container>
+
+        <!-- Usuario no logueado -->
+        <ng-template #notLoggedIn>
           <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+            <a class="nav-link" (click)="loginDialog()">Acceder</a>
           </li>
+        </ng-template>
+      </ul>
 
+      <!-- Botones a la derecha -->
+      <section *ngIf="(isLoggedIn$ | async) === false">
+        <button mat-flat-button color="primary" (click)="loginDialog()">
+          Acceder
+        </button>
+      </section>
 
-        </ul>
-        <!-- <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form> -->
-
-        <section *ngIf="(isLoggedIn$ | async) === false">
-          <button
-            mat-flat-button
-            color="primary"
-            (click)="loginDialog()"
-          >
-            Acceder
-          </button>
-        </section>
-
-        <section *ngIf="(isLoggedIn$ | async) === true">
-          <button
-            mat-flat-button
-            color="primary"
-            (click)="logOut()"
-            >
-            Cerrar Sesión
-          </button>
-        </section>
-
-      </div>
+      <section *ngIf="(isLoggedIn$ | async) === true">
+        <button mat-flat-button color="primary" (click)="logOut()">
+          Cerrar Sesión
+        </button>
+      </section>
     </div>
-  </nav>
+  </div>
+</nav>
