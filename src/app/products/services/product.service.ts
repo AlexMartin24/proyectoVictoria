@@ -18,7 +18,7 @@ import { Product } from '../model/product.model';
   providedIn: 'root',
 })
 export class ProductService {
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore) { }
 
   /* =====================================================
    * GETTERS
@@ -123,15 +123,18 @@ export class ProductService {
     productId: string,
     data: Partial<Product>
   ): Promise<void> {
-    const ref = doc(
-      this.firestore,
-      `restaurants/${restaurantId}/products/${productId}`
-    );
+    return (async () => {
+      const ref = doc(
+        this.firestore,
+        `restaurants/${restaurantId}/products/${productId}`
+      );
 
-    await updateDoc(ref, {
-      ...data,
-      updatedAt: serverTimestamp(),
-    });
+      await updateDoc(ref, {
+        ...data,
+        updatedAt: serverTimestamp(),
+      });
+    })();
+
   }
 
   /** Activa / Desactiva un producto (evita duplicación) */

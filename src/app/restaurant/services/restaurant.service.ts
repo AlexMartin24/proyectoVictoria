@@ -15,6 +15,7 @@ import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Restaurant } from '../model/restaurant.model';
 import { Product } from '../../products/model/product.model';
+import { serverTimestamp } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -137,7 +138,7 @@ export class RestaurantService {
 
       const payload: any = {
         ...updated,
-        updatedAt: new Date(),
+        updatedAt: serverTimestamp(),
       };
 
       if (updated.name) {

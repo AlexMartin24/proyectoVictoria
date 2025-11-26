@@ -39,7 +39,7 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
     private router: Router,
     private productService: ProductService,
     private productDialogService: ProductDialogService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
@@ -71,19 +71,38 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subscription?.unsubscribe();
   }
+
   editRestaurant() {
     this.restaurantDialogService
       .openRestaurantDialog({ mode: 'edit', data: this.restaurant })
       .subscribe(async (result) => {
-        if (result) {
-          await this.restaurantService.updateRestaurantData(
-            this.restaurant.restaurantId!,
-            result
-          );
+        // Caso CANCELAR
+        if (!result) {
           this.dialogService.infoDialog(
-            'Éxito',
-            'Perfil actualizado correctamente.'
+            'Cancelar',
+            'No se realizaron cambios.'
           );
+          return;
+        }
+        // Caso ACEPTAR (editar restaurante)
+        if (result) {
+          try {
+            await this.restaurantService.updateRestaurantData(
+              this.restaurant.restaurantId!,
+              result
+            );
+            this.dialogService.infoDialog(
+              'Éxito',
+              'Perfil actualizado correctamente.'
+            );
+
+          } catch (e: any) {
+            this.dialogService.errorDialog(
+              'Error',
+              e.message || 'Ocurrió un error inesperado.'
+            );
+
+          }
         }
       });
   }
@@ -95,32 +114,77 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
   }
 
   createProduct() {
-  this.productDialogService
-    .openProductDialog({ mode: 'create' })
-    .subscribe(async (result) => {
-      if (!result) return;
+    this.productDialogService
+      .openProductDialog({ mode: 'create' })
+      .subscribe(async (result) => {
 
-      await this.productService.createProduct({
-        ...result,
-        restaurantId: this.restaurant.restaurantId!,
+        // Caso CANCELAR
+        if (!result) {
+          this.dialogService.infoDialog(
+            'Cancelar',
+            'No se realizaron cambios.'
+          );
+          return;
+        }
+
+        // Caso ACEPTAR (crear producto)
+        try {
+          await this.productService.createProduct({
+            ...result,
+            restaurantId: this.restaurant.restaurantId!,
+          });
+
+          this.dialogService.infoDialog(
+            'Éxito',
+            'Producto creado correctamente.'
+          );
+
+          this.loadProducts(this.restaurant.restaurantId!);
+        } catch (e: any) {
+
+          this.dialogService.errorDialog(
+            'Error',
+            e.message || 'Ocurrió un error inesperado.'
+          );
+
+        }
       });
-
-      this.dialogService.infoDialog('Éxito', 'Producto creado correctamente.');
-      this.loadProducts(this.restaurant.restaurantId!);
-    });
-}
+  }
 
   editProduct(product: Product) {
-  this.productDialogService
-    .openProductDialog({ mode: 'edit', data: product })
-    .subscribe(async (result) => {
-      if (!result) return;
-      await this.productService.updateProduct(
-        this.restaurant.restaurantId!,
-        product.productId!,
-        result
-      );
-      this.dialogService.infoDialog('Éxito', 'Producto editado correctamente.');
-      this.loadProducts(this.restaurant.restaurantId!);
-    });
-}}
+    this.productDialogService
+      .openProductDialog({ mode: 'edit', data: product })
+      .subscribe(async (result) => {
+        if (!result) {
+          this.dialogService.infoDialog('Cancelar', 'No se realizaron cambios.');
+          return;
+        }
+
+        try {
+          console.log(this.restaurant?.restaurantId);
+
+          // ⬇️ Esto elimina restaurantId (y otros undefined)
+          const { restaurantId, ...cleanData } = result;
+
+          await this.productService.updateProduct(
+            this.restaurant.restaurantId!,
+            product.productId!,
+            cleanData
+          );
+
+          this.dialogService.infoDialog('Éxito', 'Producto editado correctamente.');
+          this.loadProducts(this.restaurant.restaurantId!);
+
+        } catch (e: any) {
+          this.dialogService.errorDialog('Error', e.message || 'Ocurrió un error inesperado.');
+        }
+      });
+  }
+}
+
+
+
+
+
+
+
