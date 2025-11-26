@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../../services/user.service';
 import { User } from '../../model/user.model';
-import { ImageUploadService } from '../../../shared/services/image-upload.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { MatCardModule } from '@angular/material/card';
@@ -11,6 +10,7 @@ import { matFormFieldAnimations, MatFormFieldModule } from '@angular/material/fo
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ImageUploadService } from '../../../shared/services/image-upload/image-upload.service';
 
 @Component({
   selector: 'app-user-profile',

@@ -5,10 +5,11 @@ import { Product, PRODUCT_CATEGORIES } from '../../model/product.model';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../services/product.service';
-import { SharedModule } from '../../../shared/shared.module';
-import { CartComponent } from '../../../customer/components/cart/cart.component';
 import { Restaurant } from '../../../restaurant/model/restaurant.model';
 import { RestaurantService } from '../../../restaurant/services/restaurant.service';
+import { CartService } from '../../../customer/services/cart.service';
+import { SharedModule } from '../../../shared/shared.module';
+import { CartComponent } from '../../../customer/components/cart/cart.component';
 
 @Component({
   selector: 'app-products',
@@ -19,22 +20,18 @@ import { RestaurantService } from '../../../restaurant/services/restaurant.servi
 })
 export class ProductsComponent implements OnInit, OnDestroy {
   @ViewChild('cartSidenav') cartSidenav!: MatSidenav;
-
   private destroy$ = new Subject<void>();
-
-  cartItems: Array<{ product: Product; quantity: number }> = [];
   selectedImage: string | null = null;
-
   categories: { label: string; products$: Observable<Product[]> }[] = [];
   offerProducts$!: Observable<Product[]>;
-
   restaurant: Restaurant | null = null;
 
   constructor(
     private productsService: ProductService,
     private route: ActivatedRoute,
-    private restaurantService: RestaurantService
-  ) {}
+    private restaurantService: RestaurantService,
+    private cartService: CartService
+  ) { }
 
   ngOnInit(): void {
     this.initializeProducts();
@@ -45,67 +42,36 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /** Carga restaurante + categorías + ofertas */
   private initializeProducts() {
     this.route.paramMap
       .pipe(
         switchMap(params => {
           const slug = params.get('slug');
-          if (!slug) {
-            console.error('No slug provided');
-            return [];
-          }
+          if (!slug) return [];
           return this.restaurantService.getRestaurantBySlug(slug);
         }),
         takeUntil(this.destroy$)
       )
       .subscribe(restaurant => {
         if (!restaurant) return;
-
         this.restaurant = restaurant;
         const restaurantId = restaurant.restaurantId!;
-
         this.categories = PRODUCT_CATEGORIES.map(label => ({
           label,
-          products$: this.productsService.getAvailableProductsByCategory(
-            restaurantId,
-            label
-          ),
+          products$: this.productsService.getAvailableProductsByCategory(restaurantId, label),
         }));
-
         this.offerProducts$ = this.productsService.getOfferProducts(restaurantId);
       });
   }
 
-  /** ---- Carrito ---- */
-
+  /** Agregar producto usando el servicio */
   addProductToCart(product: Product) {
-    const finalPrice = this.getFinalPrice(product);
-    const item = this.cartItems.find(ci => ci.product.productId === product.productId);
-
-    if (item) {
-      item.quantity++;
-      return;
-    }
-
-    // Guardamos el precio final actual para que no cambie si luego editás la oferta en Firestore
-    this.cartItems.push({
-      product: { ...product, price: finalPrice },
-      quantity: 1,
-    });
+    this.cartService.addProduct(product);
   }
 
   getCartQuantity(): number {
-    return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    return this.cartService.getTotalQuantity();
   }
-
-  private getFinalPrice(product: Product): number {
-    return product.isOffer && product.offerPrice != null
-      ? product.offerPrice
-      : product.price;
-  }
-
-  /** ---- Imagen Modal ---- */
 
   openImageModal(imageUrl?: string) {
     if (imageUrl) this.selectedImage = imageUrl;

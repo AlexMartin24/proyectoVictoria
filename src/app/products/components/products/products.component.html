@@ -1,9 +1,7 @@
 <mat-sidenav-container class="sidenav-container">
+  <!-- Carrito -->
   <mat-sidenav #cartSidenav mode="over" position="end" class="cart-sidenav">
-    <app-cart
-      [cartItems]="cartItems"
-      (updateCart)="cartItems = $event"
-    ></app-cart>
+    <app-cart></app-cart>
   </mat-sidenav>
 
   <mat-sidenav-content>
@@ -12,21 +10,14 @@
       <div class="header-menu">
         <div class="title-container">
           <h1 class="title">🍽️ Nuestra Carta</h1>
-          <p class="subtitle">
-            {{ restaurant?.name || "Bienvenido a nuestro menú" }}
-          </p>
-          <p class="subtitle">
-            {{ restaurant?.description || "Mira nuestras opciones" }}
-          </p>
+          <p class="subtitle">{{ restaurant?.name || 'Bienvenido a nuestro menú' }}</p>
+          <p class="subtitle">{{ restaurant?.description || 'Mira nuestras opciones' }}</p>
         </div>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="cartSidenav.toggle()"
-          class="cart-button"
-        >
+
+        <!-- Botón Carrito con badge reactivo -->
+        <button mat-raised-button color="primary" (click)="cartSidenav.toggle()" class="cart-button">
           🛒 Carrito
-          <span class="cart-badge" *ngIf="cartItems.length > 0">
+          <span class="cart-badge" *ngIf="getCartQuantity() > 0">
             {{ getCartQuantity() }}
           </span>
         </button>
@@ -34,63 +25,46 @@
 
       <!-- Pestañas: Categorías + Ofertas -->
       <mat-tab-group mat-stretch-tabs="true">
+
         <!-- Pestaña de Ofertas -->
         <mat-tab label="🔥 Ofertas">
           <ng-container *ngIf="offerProducts$ | async as offerProducts">
             <div class="grid" *ngIf="offerProducts.length > 0; else emptyOffer">
-              <mat-card
-                class="menu-card"
-                [ngClass]="{ offer: item.isOffer }"
-                *ngFor="let item of offerProducts"
-              >
+              <mat-card class="menu-card" *ngFor="let item of offerProducts">
                 <div class="card-content-wrapper">
+
                   <!-- Imagen -->
                   <div class="image-section">
-                    <img
-                      mat-card-image
-                      [src]="item.imageUrl || 'assets/img/not-found.png'"
-                      alt="{{ item.name }}"
-                      (click)="openImageModal(item.imageUrl)"
-                      (error)="onImageError($event)"
-                    />
+                    <img mat-card-image [src]="item.imageUrl || 'assets/img/not-found.png'" alt="{{ item.name }}"
+                      (click)="openImageModal(item.imageUrl)" (error)="onImageError($event)">
                   </div>
 
                   <!-- Información -->
                   <div class="text-section">
                     <h2>{{ item.name }}</h2>
                     <p>{{ item.description }}</p>
+
                     <div class="price-wrapper">
-                      <!-- Si está en oferta -->
                       <ng-container *ngIf="item.isOffer; else normalPrice">
-                        <span class="old-price">
-                          {{ item.price | currency : "USD" }}
-                        </span>
-
-                        <span class="offer-price">
-                          {{ item.offerPrice | currency : "USD" }}
-                        </span>
+                        <span class="old-price">{{ item.price | currency : 'USD' }}</span>
+                        <span class="offer-price">{{ item.offerPrice | currency : 'USD' }}</span>
                       </ng-container>
-
-                      <!-- Precio normal -->
                       <ng-template #normalPrice>
-                        <span class="price-normal">
-                          {{ item.price | currency : "USD" }}
-                        </span>
+                        <span class="price-normal">{{ item.price | currency : 'USD' }}</span>
                       </ng-template>
                     </div>
+
                     <div class="button-wrapper">
-                      <button
-                        mat-raised-button
-                        color="primary"
-                        (click)="addProductToCart(item)"
-                      >
+                      <button mat-raised-button color="primary" (click)="addProductToCart(item)">
                         Añadir 🛒
                       </button>
                     </div>
                   </div>
+
                 </div>
               </mat-card>
             </div>
+
             <ng-template #emptyOffer>
               <div class="empty-message">No hay ofertas disponibles.</div>
             </ng-template>
@@ -103,56 +77,45 @@
             <div class="grid" *ngIf="products.length > 0; else emptyCategory">
               <mat-card class="menu-card" *ngFor="let item of products">
                 <div class="card-content-wrapper">
+
                   <!-- Imagen -->
                   <div class="image-section">
-                    <img
-                      mat-card-image
-                      [src]="item.imageUrl || 'assets/img/not-found.png'"
-                      alt="{{ item.name }}"
-                      (click)="openImageModal(item.imageUrl)"
-                      (error)="onImageError($event)"
-                    />
+                    <img mat-card-image [src]="item.imageUrl || 'assets/img/not-found.png'" alt="{{ item.name }}"
+                      (click)="openImageModal(item.imageUrl)" (error)="onImageError($event)">
                   </div>
 
                   <!-- Información -->
                   <div class="text-section">
                     <h2>{{ item.name }}</h2>
                     <p>{{ item.description }}</p>
+
                     <div class="price-wrapper">
                       <ng-container *ngIf="item.isOffer; else normalPriceCat">
-                        <span class="old-price">
-                          {{ item.price | currency : "USD" }}
-                        </span>
-
-                        <span class="offer-price">
-                          {{ item.offerPrice | currency : "USD" }}
-                        </span>
+                        <span class="old-price">{{ item.price | currency : 'USD' }}</span>
+                        <span class="offer-price">{{ item.offerPrice | currency : 'USD' }}</span>
                       </ng-container>
-
                       <ng-template #normalPriceCat>
-                        <span class="price-normal">
-                          {{ item.price | currency : "USD" }}
-                        </span>
+                        <span class="price-normal">{{ item.price | currency : 'USD' }}</span>
                       </ng-template>
                     </div>
+
                     <div class="button-wrapper">
-                      <button
-                        mat-raised-button
-                        color="primary"
-                        (click)="addProductToCart(item)"
-                      >
+                      <button mat-raised-button color="primary" (click)="addProductToCart(item)">
                         Añadir 🛒
                       </button>
                     </div>
                   </div>
+
                 </div>
               </mat-card>
             </div>
+
             <ng-template #emptyCategory>
               <div class="empty-message">No hay productos disponibles.</div>
             </ng-template>
           </ng-container>
         </mat-tab>
+
       </mat-tab-group>
     </div>
 
@@ -160,5 +123,6 @@
     <div class="image-modal" *ngIf="selectedImage" (click)="closeImageModal()">
       <img [src]="selectedImage" alt="Imagen ampliada" />
     </div>
+
   </mat-sidenav-content>
 </mat-sidenav-container>

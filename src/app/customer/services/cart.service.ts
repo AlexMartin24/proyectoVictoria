@@ -1,52 +1,69 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { CartItem } from '../model/cart.model';
+import { BehaviorSubject } from 'rxjs';
 import { Product } from '../../products/model/product.model';
 
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class CartService {
-  private items: CartItem[] = [];
-  private itemsSubject = new BehaviorSubject<CartItem[]>([]);
-  items$ = this.itemsSubject.asObservable();
+  private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
+  cartItems$ = this.cartItemsSubject.asObservable();
 
-  constructor() {}
+  /** Obtener valor actual */
+  getCartItems(): CartItem[] {
+    return this.cartItemsSubject.getValue();
+  }
 
-  /** Agrega o actualiza un producto */
-  addToCart(product: Product, quantity: number = 1): void {
-    const existing = this.items.find(i => i.id === product.id);
+  /** Agregar o incrementar producto */
+  addProduct(product: Product) {
+    const items = this.getCartItems();
+    const existing = items.find(ci => ci.product.productId === product.productId);
+    const finalPrice = product.isOffer && product.offerPrice != null ? product.offerPrice : product.price;
 
     if (existing) {
-      existing.quantity += quantity;
-
-      // Si la cantidad llega a 0, se quita directo
-      if (existing.quantity <= 0) {
-        this.removeFromCart(product.id!);
-        return;
-      }
-
+      existing.quantity++;
     } else {
-      this.items.push({ ...product, quantity });
+      items.push({ product: { ...product, price: finalPrice }, quantity: 1 });
     }
 
-    this.itemsSubject.next([...this.items]);
+    this.cartItemsSubject.next([...items]);
   }
 
-  /** Elimina un item */
-  removeFromCart(productId: string): void {
-    this.items = this.items.filter(i => i.id !== productId);
-    this.itemsSubject.next([...this.items]);
+  /** Incrementar cantidad */
+  increaseQuantity(item: CartItem) {
+    item.quantity++;
+    this.cartItemsSubject.next([...this.getCartItems()]);
   }
 
-  /** Limpia carrito */
-  clearCart(): void {
-    this.items = [];
-    this.itemsSubject.next([]);
+  /** Decrementar cantidad */
+  decreaseQuantity(item: CartItem) {
+    if (item.quantity > 1) {
+      item.quantity--;
+    } else {
+      this.removeItem(item);
+      return;
+    }
+    this.cartItemsSubject.next([...this.getCartItems()]);
   }
 
-  /** Total */
-  getTotal(): number {
-    return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  /** Eliminar item */
+  removeItem(item: CartItem) {
+    const items = this.getCartItems().filter(ci => ci !== item);
+    this.cartItemsSubject.next([...items]);
+  }
+
+  /** Total de cantidad */
+  getTotalQuantity(): number {
+    return this.getCartItems().reduce((sum, ci) => sum + ci.quantity, 0);
+  }
+
+  /** Total precio */
+  getTotalPrice(): number {
+    return this.getCartItems().reduce((sum, ci) => sum + ci.product.price * ci.quantity, 0);
   }
 }
