@@ -1,51 +1,40 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatListModule } from '@angular/material/list';
+import { Component } from '@angular/core';
+import { CartService, CartItem } from '../../services/cart.service';
+import { SharedModule } from '../../../shared/shared.module';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { SharedModule } from '../../../shared/shared.module';
-import { Product } from '../../../products/model/product.model';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, CommonModule, MatButtonModule, MatIconModule],
   templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css'],
+  styleUrls: ['./cart.component.css']
 })
 export class CartComponent {
-  @Input() cartItems: Array<{ product: Product; quantity: number }> = [];
-  @Output() updateCart = new EventEmitter<
-    Array<{ product: Product; quantity: number }>
-  >();
+  cartItems: CartItem[] = [];
 
-  increaseQuantity(item: { product: Product; quantity: number }) {
-    item.quantity += 1;
-    this.emitCartUpdate();
+  constructor(public cartService: CartService) {
+    // Suscribirse a cambios del carrito
+    this.cartService.cartItems$.subscribe(items => {
+      this.cartItems = items;
+    });
   }
 
-  decreaseQuantity(item: { product: Product; quantity: number }) {
-    if (item.quantity > 1) {
-      item.quantity -= 1;
-    } else {
-      this.removeItem(item);
-    }
-    this.emitCartUpdate();
+  increaseQuantity(item: CartItem) {
+    this.cartService.increaseQuantity(item);
   }
 
-  removeItem(item: { product: Product; quantity: number }) {
-    this.cartItems = this.cartItems.filter((ci) => ci !== item);
-    this.emitCartUpdate();
+  decreaseQuantity(item: CartItem) {
+    this.cartService.decreaseQuantity(item);
+  }
+
+  removeItem(item: CartItem) {
+    this.cartService.removeItem(item);
   }
 
   getTotal() {
-    return this.cartItems.reduce(
-      (total, ci) => total + ci.product.price * ci.quantity,
-      0
-    );
-  }
-
-  private emitCartUpdate() {
-    this.updateCart.emit(this.cartItems);
+    return this.cartService.getTotalPrice();
   }
 }

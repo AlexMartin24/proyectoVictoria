@@ -8,7 +8,7 @@ import {
   MAT_DATE_FORMATS,
   MAT_NATIVE_DATE_FORMATS,
 } from '@angular/material/core';
-import { CustomDateAdapter } from '../../../shared/fecha/CustomDateAdapter';
+import { CustomDateAdapter } from '../../../shared/services/date/CustomDateAdapter';
 import {
   regexTextos,
   regexMail,

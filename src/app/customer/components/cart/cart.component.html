@@ -6,13 +6,7 @@
   <ng-container *ngIf="cartItems.length; else emptyCart">
     <mat-list-item *ngFor="let item of cartItems" class="cart-item-card">
       <div class="cart-item-wrapper">
-        <!-- Botón eliminar con cruz en la esquina superior derecha -->
-        <button
-          mat-icon-button
-          color="warn"
-          class="remove-btn"
-          (click)="removeItem(item)"
-        >
+        <button mat-icon-button color="warn" class="remove-btn" (click)="removeItem(item)">
           <mat-icon>close</mat-icon>
         </button>
 
@@ -21,21 +15,9 @@
           <span class="price">{{ item.product.price | currency : "USD" }}</span>
 
           <div class="quantity-controls">
-            <button
-              mat-mini-fab
-              color="primary"
-              (click)="decreaseQuantity(item)"
-            >
-              -
-            </button>
+            <button mat-mini-fab color="primary" (click)="decreaseQuantity(item)">-</button>
             <span>{{ item.quantity }}</span>
-            <button
-              mat-mini-fab
-              color="primary"
-              (click)="increaseQuantity(item)"
-            >
-              +
-            </button>
+            <button mat-mini-fab color="primary" (click)="increaseQuantity(item)">+</button>
           </div>
         </div>
       </div>
