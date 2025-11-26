@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { Product, PRODUCT_CATEGORIES } from '../../model/product.model';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute } from '@angular/router';
@@ -17,18 +17,18 @@ import { RestaurantService } from '../../../restaurant/services/restaurant.servi
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css'],
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
   @ViewChild('cartSidenav') cartSidenav!: MatSidenav;
+
+  private destroy$ = new Subject<void>();
 
   cartItems: Array<{ product: Product; quantity: number }> = [];
   selectedImage: string | null = null;
 
-  // Categorías normales
   categories: { label: string; products$: Observable<Product[]> }[] = [];
-  // Pestaña de ofertas
   offerProducts$!: Observable<Product[]>;
+
   restaurant: Restaurant | null = null;
-  restaurant$!: Observable<Restaurant>;
 
   constructor(
     private productsService: ProductService,
@@ -40,68 +40,75 @@ export class ProductsComponent implements OnInit {
     this.initializeProducts();
   }
 
-  initializeProducts() {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** Carga restaurante + categorías + ofertas */
+  private initializeProducts() {
     this.route.paramMap
       .pipe(
-        switchMap((params) => {
+        switchMap(params => {
           const slug = params.get('slug');
-          if (!slug) throw new Error('No se recibió slug del restaurante');
-          // Obtener restaurantId a partir del slug
+          if (!slug) {
+            console.error('No slug provided');
+            return [];
+          }
           return this.restaurantService.getRestaurantBySlug(slug);
-        })
+        }),
+        takeUntil(this.destroy$)
       )
-      .subscribe((restaurant) => {
+      .subscribe(restaurant => {
         if (!restaurant) return;
 
-        this.restaurant = restaurant; // <-- ya puedes usar name, description, etc.
-
+        this.restaurant = restaurant;
         const restaurantId = restaurant.restaurantId!;
-        // Inicializar categorías
-        this.categories = PRODUCT_CATEGORIES.map((label) => ({
+
+        this.categories = PRODUCT_CATEGORIES.map(label => ({
           label,
           products$: this.productsService.getAvailableProductsByCategory(
             restaurantId,
             label
           ),
         }));
-        // Inicializar pestaña de ofertas
-        this.offerProducts$ =
-          this.productsService.getOfferProducts(restaurantId);
+
+        this.offerProducts$ = this.productsService.getOfferProducts(restaurantId);
       });
   }
 
+  /** ---- Carrito ---- */
+
   addProductToCart(product: Product) {
     const finalPrice = this.getFinalPrice(product);
-
-    const item = this.cartItems.find(
-      (ci) => ci.product.productId === product.productId
-    );
+    const item = this.cartItems.find(ci => ci.product.productId === product.productId);
 
     if (item) {
-      item.quantity += 1;
-    } else {
-      // Guardamos el precio final para que no cambie si luego editás la oferta
-      this.cartItems.push({
-        product: { ...product, price: finalPrice },
-        quantity: 1,
-      });
+      item.quantity++;
+      return;
     }
+
+    // Guardamos el precio final actual para que no cambie si luego editás la oferta en Firestore
+    this.cartItems.push({
+      product: { ...product, price: finalPrice },
+      quantity: 1,
+    });
   }
 
   getCartQuantity(): number {
     return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
   }
 
-  getFinalPrice(product: Product): number {
+  private getFinalPrice(product: Product): number {
     return product.isOffer && product.offerPrice != null
       ? product.offerPrice
       : product.price;
   }
 
-  openImageModal(imageUrl: string | undefined) {
-    if (imageUrl) {
-      this.selectedImage = imageUrl;
-    }
+  /** ---- Imagen Modal ---- */
+
+  openImageModal(imageUrl?: string) {
+    if (imageUrl) this.selectedImage = imageUrl;
   }
 
   closeImageModal() {

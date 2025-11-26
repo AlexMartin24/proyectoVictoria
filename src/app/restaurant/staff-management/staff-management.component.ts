@@ -1,59 +1,62 @@
 import {
   Component,
   OnInit,
-  inject,
-  TemplateRef,
-  ViewChild,
-  Input,
   OnChanges,
+  OnDestroy,
+  Input,
+  ViewChild,
+  TemplateRef,
+  inject,
 } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
+
 import { SharedModule } from '../../shared/shared.module';
-import { User } from '../../users/model/user.model';
-import { AuthService } from '../../auth/services/auth.service';
-import { DialogService } from '../../core/services/dialog.service';
-import {
-  BaseColumn,
-  BaseTableComponent,
-} from '../../shared/components/base-table/base-table.component';
-import { UserService } from '../../users/services/user.service';
-import { UserDialogComponent } from '../../users/components/user-dialog/user-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { BaseTableComponent, BaseColumn } from '../../shared/components/base-table/base-table.component';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
+
+import { User } from '../../users/model/user.model';
+import { UserService } from '../../users/services/user.service';
+import { DialogService } from '../../core/services/dialog.service';
+import { UserDialogComponent } from '../../users/components/user-dialog/user-dialog.component';
 
 @Component({
   selector: 'app-staff-management',
   standalone: true,
-  imports: [SharedModule, BaseTableComponent,MatChipsModule ],
+  imports: [SharedModule, BaseTableComponent, MatChipsModule],
   templateUrl: './staff-management.component.html',
   styleUrl: './staff-management.component.css',
 })
-export class StaffManagementComponent implements OnInit, OnChanges {
+export class StaffManagementComponent implements OnInit, OnChanges, OnDestroy {
+
+  // Services
   private userService = inject(UserService);
   private dialogService = inject(DialogService);
-  private dialog: MatDialog = inject(MatDialog);
+  private dialog = inject(MatDialog);
 
+  // Inputs
   @Input() restaurantId!: string;
   @Input() showDisabled: boolean = false;
 
+  // Data
   staff: User[] = [];
 
-  // 🔥 Las columnas con template para roles
+  // Destroy pattern
+  private destroy$ = new Subject<void>();
+
+  // Templates
+  @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
+  @ViewChild('rolesTemplate', { static: true }) rolesTemplate!: TemplateRef<any>;
+
+  // Table columns
   columns: BaseColumn[] = [
     { id: 'fullname', label: 'Nombre' },
     { id: 'email', label: 'Email' },
-    { id: 'roles', label: 'Roles', template: null }, // Usará rolesTemplate
+    { id: 'roles', label: 'Roles', template: null },
   ];
 
-  @ViewChild('actionsTemplate', { static: true })
-  actionsTemplate!: TemplateRef<any>;
-
-  @ViewChild('rolesTemplate', { static: true })
-  rolesTemplate!: TemplateRef<any>;
-
   ngOnInit() {
-    // asignar template a columna roles
-    this.columns.find((c) => c.id === 'roles')!.template = this.rolesTemplate;
-
+    this.columns.find(c => c.id === 'roles')!.template = this.rolesTemplate;
     this.loadStaff();
   }
 
@@ -61,7 +64,7 @@ export class StaffManagementComponent implements OnInit, OnChanges {
     this.loadStaff();
   }
 
-  loadStaff() {
+   loadStaff() {
     if (!this.restaurantId) return;
 
     const observable = this.showDisabled
@@ -79,6 +82,7 @@ export class StaffManagementComponent implements OnInit, OnChanges {
     });
   }
 
+
   toggleDisabled() {
     this.showDisabled = !this.showDisabled;
     this.loadStaff();
@@ -91,6 +95,7 @@ export class StaffManagementComponent implements OnInit, OnChanges {
         message: '¿Deseas deshabilitar este empleado?',
         type: 'confirm',
       })
+      .pipe(takeUntil(this.destroy$))
       .subscribe(async (ok) => {
         if (ok && user.uid) {
           await this.userService.disableStaffMember(user.uid);
@@ -107,6 +112,7 @@ export class StaffManagementComponent implements OnInit, OnChanges {
         message: '¿Deseas volver a habilitar este empleado?',
         type: 'enable',
       })
+      .pipe(takeUntil(this.destroy$))
       .subscribe(async (ok) => {
         if (ok && user.uid) {
           await this.userService.enableStaffMember(user.uid);
@@ -128,5 +134,10 @@ export class StaffManagementComponent implements OnInit, OnChanges {
     await this.userService.updateUser(user.uid, { roles: result.roles });
     this.dialogService.infoDialog('OK', 'Roles actualizados correctamente.');
     this.loadStaff();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

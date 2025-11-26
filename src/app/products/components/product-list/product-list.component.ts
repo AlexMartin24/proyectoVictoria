@@ -19,18 +19,24 @@ import { BaseTableComponent } from '../../../shared/components/base-table/base-t
   styleUrls: ['./product-list.component.css'],
 })
 export class ProductListComponent implements AfterViewInit {
+  
+  /** Inputs */
   @Input() products: Product[] = [];
+  @Input() restaurantId!: string;
 
-  // Eventos correctos
+  /** Outputs */
   @Output() edit = new EventEmitter<Product>();
   @Output() remove = new EventEmitter<Product>();
   @Output() enable = new EventEmitter<Product>();
   @Output() disable = new EventEmitter<Product>();
   @Output() create = new EventEmitter<void>();
 
+  /** Templates */
   @ViewChild('tplAvailable', { static: true }) tplAvailable: any;
   @ViewChild('tplOffer', { static: true }) tplOffer: any;
+  @ViewChild('actions', { static: true }) actions: any;
 
+  /** Columns dinámicas */
   columns: any[] = [];
 
   constructor(private cdr: ChangeDetectorRef) {}
@@ -38,19 +44,19 @@ export class ProductListComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.columns = [
       { id: 'name', label: 'Nombre' },
-      { id: 'price', label: 'Precio' },
-      { id: 'available', label: 'Disponible', template: this.tplAvailable },
-      { id: 'category', label: 'Categoría' },
+      { id: 'price', label: 'Precio Regular' },
       { id: 'isOffer', label: 'Oferta', template: this.tplOffer },
+      { id: 'offerPrice', label: 'Precio Oferta' },
+      { id: 'category', label: 'Categoría' },
+      { id: 'available', label: 'Disponible', template: this.tplAvailable },
     ];
 
     this.cdr.detectChanges();
   }
 
-  /** EMITIR EVENTOS AL PADRE */
+  /** Eventos */
   onEdit(product: Product) {
-    console.log('Editing product:', product);
-    this.edit.emit(product);   // <-- función correcta
+    this.edit.emit(product);
   }
 
   onRemove(product: Product) {
@@ -65,10 +71,7 @@ export class ProductListComponent implements AfterViewInit {
     this.disable.emit(product);
   }
 
-  @Input() restaurantId!: string;
-
   onCreate() {
-    console.log('Create clicked');
-    this.create.emit();     // <-- correcto
+    this.create.emit();
   }
 }

@@ -10,23 +10,38 @@ type DialogMode = 'create' | 'edit';
   providedIn: 'root',
 })
 export class UserDialogService {
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog) {}
 
   openUserDialog(options: { mode: DialogMode; data?: User }): Observable<any> {
+    const emptyUser: User = {
+      uid: '',
+      email: '',
+      name: '',
+      lastname: '',
+      birthdate: null,
+      address: '',
+      phone: '',
+      photoURL: '',
+      roles: {
+        adminGlobal: false,
+        adminLocal: false,
+        mozo: false,
+        cocina: false,
+        gerencia: false,
+        customer: false,
+        guest: false,
+      },
+      restaurantsOwner: [],
+      restaurantsStaff: [],
+      enabled: true,
+      createdAt: null,
+    };
+
     const dialogRef = this.dialog.open(UserDialogComponent, {
       disableClose: true,
       data: {
-        mode: options.mode,
-        user: options.mode === 'edit' ? options.data : {
-          name: '',
-          lastname: '',
-          email: '',
-          birthdate: '',
-          phone: '',
-          address: '',
-          schooldId: '',
-          role: '',
-        }
+        modo: options.mode === 'edit' ? 'editar-usuario' : 'editar-perfil',
+        user: options.data ?? emptyUser,
       },
     });
 

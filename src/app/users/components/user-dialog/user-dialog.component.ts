@@ -40,64 +40,52 @@ export class UserDialogComponent {
     const user = data.user;
 
     this.editForm = new FormGroup({
-      name: new FormControl(user.name, [
-        Validators.required,
-        // Validators.pattern(regexTextos),
-      ]),
-      lastname: new FormControl(user.lastname, [
-        Validators.required,
-        // Validators.pattern(regexTextos),
-      ]),
-      // email: new FormControl(user.email, [
-      //   Validators.required,
-      //   Validators.pattern(regexMail),
-      // ]),
-email: new FormControl({ value: user.email, disabled: true }),
-      birthdate: new FormControl(user.birthdate ?? ''),
-      address: new FormControl(user.address ?? '', [
-        Validators.pattern(regexDireccion),
-      ]),
-      phone: new FormControl(user.phone ?? '', [
-        Validators.pattern(regexNumeros),
-      ]),
+      name: new FormControl(user.name ?? ''),
+      lastname: new FormControl(user.lastname ?? ''),
+      email: new FormControl({ value: user.email, disabled: true }),
+      phone: new FormControl(user.phone ?? ''),
+      address: new FormControl(user.address ?? ''),
+      birthdate: new FormControl(
+        user.birthdate ? new Date(user.birthdate) : null
+      ),
 
-      // Roles
-      adminGlobal: new FormControl(user.roles.adminGlobal),
-      adminLocal: new FormControl(user.roles.adminLocal),
-      mozo: new FormControl(user.roles.mozo),
-      cocina: new FormControl(user.roles.cocina),
-      gerencia: new FormControl(user.roles.gerencia),
-      customer: new FormControl(user.roles.customer),
-      guest: new FormControl(user.roles.guest),
+      adminGlobal: new FormControl(user.roles?.adminGlobal ?? false),
+      adminLocal: new FormControl(user.roles?.adminLocal ?? false),
+      mozo: new FormControl(user.roles?.mozo ?? false),
+      cocina: new FormControl(user.roles?.cocina ?? false),
+      gerencia: new FormControl(user.roles?.gerencia ?? false),
+      customer: new FormControl(user.roles?.customer ?? false),
+      guest: new FormControl(user.roles?.guest ?? false),
     });
   }
 
-aceptar() {
-  if (this.editForm.valid) {
-    const formData = this.editForm.getRawValue(); // incluye campos deshabilitados si los necesitás
-    const roles = {
-      adminGlobal: formData.adminGlobal,
-      adminLocal: formData.adminLocal,
-      mozo: formData.mozo,
-      cocina: formData.cocina,
-      gerencia: formData.gerencia,
-      customer: formData.customer,
-      guest: formData.guest,
+  aceptar() {
+    if (!this.editForm.valid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    const f = this.editForm.getRawValue();
+
+    const partialUpdate: Partial<User> = {
+      name: f.name,
+      lastname: f.lastname,
+      birthdate: f.birthdate,
+      address: f.address,
+      phone: f.phone,
+      roles: {
+        adminGlobal: f.adminGlobal,
+        adminLocal: f.adminLocal,
+        mozo: f.mozo,
+        cocina: f.cocina,
+        gerencia: f.gerencia,
+        customer: f.customer,
+        guest: f.guest,
+      },
     };
 
-    this.dialogRef.close({
-      uid: this.data.user.uid,
-      roles,
-      name: formData.name,
-      lastname: formData.lastname,
-      birthdate: formData.birthdate,
-      address: formData.address,
-      phone: formData.phone
-    });
-  } else {
-    this.editForm.markAllAsTouched();
+    this.dialogRef.close(partialUpdate);
   }
-}
   cancelar() {
     this.dialogRef.close();
   }

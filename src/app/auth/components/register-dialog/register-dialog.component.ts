@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
 import { regexMail } from '../../../shared/pattern/patterns';
-import { validatePassword } from '../../passwordValidator';
+import { validatePassword } from '../../helper/passwordValidator';
 import { MatDialogRef } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
 import { DialogService } from '../../../core/services/dialog.service';

@@ -101,7 +101,7 @@ export class AuthService {
         restaurantsOwner: [],
         restaurantsStaff: [],
         enabled: true,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       });
 
       return { uid: user.uid };
@@ -136,7 +136,7 @@ export class AuthService {
       restaurantsOwner: [],
       restaurantsStaff: [],
       enabled: true,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     });
 
     return user.uid;
@@ -182,15 +182,6 @@ export class AuthService {
   }
 
   // -------------------- UTILITIES --------------------
-  private validateEmail(email: string): boolean {
-    const regex = new RegExp(regexMail);
-    return regex.test(email);
-  }
-
-  private validatePassword(password: string): boolean {
-    return password.length >= 6;
-  }
-
   private handleError(error: any): never {
     if (error instanceof FirebaseError) {
       throw new Error(this.errorHandler.handleFirebaseError(error));

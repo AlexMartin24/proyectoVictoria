@@ -6,10 +6,7 @@
   {{ p.isOffer ? 'Sí' : 'No' }}
 </ng-template>
 
-<!-- <button mat-stroked-button class="toggle-btn" (click)="onCreate()">
-  <mat-icon>add</mat-icon> Agregar
-</button> -->
-
+<!-- ACCIONES -->
 <ng-template #actions let-p>
   <button mat-icon-button color="primary" (click)="onEdit(p)">
     <mat-icon>edit</mat-icon>
@@ -19,17 +16,15 @@
     <mat-icon>delete</mat-icon>
   </button>
 
-  <button mat-icon-button color="primary" (click)="onEnable(p)" *ngIf="!p.available">
+  <button mat-icon-button (click)="onEnable(p)" *ngIf="!p.available">
     <mat-icon>restore_from_trash</mat-icon>
   </button>
 </ng-template>
 
-<!-- ====== BASE TABLE ====== -->
+<!-- TABLA -->
 <app-base-table
   [columns]="columns"
   [data]="products"
   [actionsTemplate]="actions"
   filterPlaceholder="Buscar productos: "
 ></app-base-table>
-
-

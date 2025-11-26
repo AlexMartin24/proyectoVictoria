@@ -1,17 +1,12 @@
-import { Routes } from '@angular/router';
-// import { ListUserComponent } from '../components/list-user/list-user.component';
-
+import { Routes } from "@angular/router";
+import { UserProfileComponent } from "../components/user-profile/user-profile.component";
 
 export const USER_ROUTES: Routes = [
-  
-
-  // { path: 'list', component: ListUserComponent },
-
-  // {
-  //   path: 'registrarse',
-  //   component: RegistrarseComponent,
-  //   children: [
-  //     { path: 'form', component: FormComponent }
-  //   ]
-  // }
+  {
+    path: '',
+    children: [
+      { path: 'profile', component: UserProfileComponent },           // /users/profile
+      { path: 'profile/:userId', component: UserProfileComponent },  // /users/profile/123
+    ],
+  },
 ];

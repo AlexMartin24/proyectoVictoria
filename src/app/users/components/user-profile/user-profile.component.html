@@ -1,1 +1,64 @@
-<p>user-profile works!</p>
+<mat-card *ngIf="!loading">
+  <div class="profile-container">
+
+    <!-- FOTO -->
+    <div class="photo-section">
+      <img
+        class="profile-photo"
+        [src]="imagePreview || 'assets/img/default-user.png'"
+        alt="Foto de perfil"
+      />
+
+      <button mat-stroked-button color="primary" (click)="fileInput.click()">
+        Cambiar foto
+      </button>
+
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        hidden
+        (change)="onPhotoSelect($event)"
+      />
+    </div>
+
+    <!-- FORM -->
+    <div class="form-section">
+      <form [formGroup]="profileForm">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="name" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Apellido</mat-label>
+          <input matInput formControlName="lastname" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Fecha de nacimiento</mat-label>
+          <input matInput formControlName="birthdate" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Dirección</mat-label>
+          <input matInput formControlName="address" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Teléfono</mat-label>
+          <input matInput formControlName="phone" />
+        </mat-form-field>
+      </form>
+
+      <button mat-raised-button color="primary" (click)="save()">
+        Guardar cambios
+      </button>
+    </div>
+  </div>
+</mat-card>

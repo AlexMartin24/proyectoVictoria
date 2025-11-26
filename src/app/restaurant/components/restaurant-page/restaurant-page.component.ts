@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 import { Restaurant } from '../../model/restaurant.model';
 import { RestaurantService } from '../../services/restaurant.service';
 import { RestaurantDialogService } from '../../services/restaurant-dialog.service';
-import { Subscription } from 'rxjs';
+import { DialogService } from '../../../core/services/dialog.service';
+import { Subject, takeUntil } from 'rxjs';
 import { RestaurantListComponent } from '../restaurant-list/restaurant-list.component';
 import { SharedModule } from '../../../shared/shared.module';
-import { DialogService } from '../../../core/services/dialog.service';
 
 @Component({
   selector: 'app-restaurant-page',
@@ -16,10 +16,10 @@ import { DialogService } from '../../../core/services/dialog.service';
   styleUrls: ['./restaurant-page.component.css'],
 })
 export class RestaurantPageComponent implements OnInit, OnDestroy {
-  showDisabledTable = false;
-  private restaurantsSub?: Subscription;
-
   restaurants: Restaurant[] = [];
+  showDisabledTable = false;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -28,146 +28,142 @@ export class RestaurantPageComponent implements OnInit, OnDestroy {
     private dialogService: DialogService
   ) {}
 
+  /* ---------------------------------------------------
+   * INIT
+  ---------------------------------------------------- */
   ngOnInit() {
-    this.loadRestaurants();
+    this.listenRestaurants();
   }
 
+  /* ---------------------------------------------------
+   * CLEANUP
+  ---------------------------------------------------- */
   ngOnDestroy() {
-    this.restaurantsSub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  /** ---------------------------------------------------
-   * Navegación con SLUG
-   ---------------------------------------------------- */
+  /* ---------------------------------------------------
+   * STREAM PRINCIPAL DE RESTAURANTES
+  ---------------------------------------------------- */
+  private listenRestaurants() {
+    this.restaurantService
+      .getRestaurantsByStatus(!this.showDisabledTable)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data) => (this.restaurants = data));
+  }
+
+  private reloadStream() {
+    this.destroy$.next();      // corta flujo actual
+    this.listenRestaurants();  // inicia nuevo listener
+  }
+
+  /* ---------------------------------------------------
+   * NAVEGACIÓN
+  ---------------------------------------------------- */
   goToRestaurantDetail(slug: string) {
     this.router.navigate(['/restaurant', slug]);
   }
 
-  /** ---------------------------------------------------
-   * Crear restaurante (usa createRestaurant → slug automático)
-   ---------------------------------------------------- */
+  /* ---------------------------------------------------
+   * CREAR RESTAURANTE
+  ---------------------------------------------------- */
   addRestaurant() {
     this.restaurantDialogService
       .openRestaurantDialog({ mode: 'create' })
+      .pipe(takeUntil(this.destroy$))
       .subscribe(async (result) => {
         if (!result) return;
 
         try {
-          const newRestaurant = await this.restaurantService.createRestaurant(
-            result
-          );
-          this.dialogService.infoDialog(
-            'Éxito',
-            'Restaurante creado correctamente.'
-          );
-          this.loadRestaurants();
-          // Opcional: navegar al perfil recién creado
-          this.goToRestaurantDetail(newRestaurant.slug);
-        } catch (error: any) {
-          this.dialogService.errorDialog('Error', error.message);
+          const newRes = await this.restaurantService.createRestaurant(result);
+
+          this.dialogService.infoDialog('Éxito', 'Restaurante creado.');
+
+          // Firestore emitirá update → no hace falta reload
+          this.goToRestaurantDetail(newRes.slug);
+        } catch (e: any) {
+          this.dialogService.errorDialog('Error', e.message);
         }
       });
   }
 
-  /** ---------------------------------------------------
-   * Alternar entre habilitados/deshabilitados
-   ---------------------------------------------------- */
+  /* ---------------------------------------------------
+   * CAMBIAR TABLA (habilitados / deshabilitados)
+  ---------------------------------------------------- */
   showRestaurantTable() {
     this.showDisabledTable = !this.showDisabledTable;
-    this.loadRestaurants();
+    this.reloadStream();
   }
 
-  /** ---------------------------------------------------
-   * Cargar restaurantes según estado
-   ---------------------------------------------------- */
-  private loadRestaurants() {
-    this.restaurantsSub?.unsubscribe();
-
-    this.restaurantsSub = this.restaurantService
-      .getRestaurantsByStatus(!this.showDisabledTable)
-      .subscribe((data) => (this.restaurants = data));
-  }
-
-  /** ---------------------------------------------------
-   * Editar restaurante
-   ---------------------------------------------------- */
+  /* ---------------------------------------------------
+   * EDITAR
+  ---------------------------------------------------- */
   onEdit(restaurant: Restaurant) {
     this.restaurantDialogService
       .openRestaurantDialog({ mode: 'edit', data: restaurant })
+      .pipe(takeUntil(this.destroy$))
       .subscribe(async (result) => {
-        if (result) {
-          try {
-            await this.restaurantService.updateRestaurantData(
-              restaurant.restaurantId!,
-              result
-            );
+        if (!result) return;
 
-            this.dialogService.infoDialog(
-              'Éxito',
-              'Datos editados correctamente.'
-            );
+        try {
+          await this.restaurantService.updateRestaurantData(
+            restaurant.restaurantId,
+            result
+          );
 
-            // recargar porque pudo cambiar el nombre → slug se vuelve a generar
-            this.loadRestaurants();
-          } catch (error) {
-            this.dialogService.errorDialog(
-              'Error',
-              'No se pudo editar los datos.'
-            );
-          }
+          this.dialogService.infoDialog('Éxito', 'Datos actualizados.');
+
+          // Firestore emitirá update → no recargamos
+        } catch {
+          this.dialogService.errorDialog(
+            'Error',
+            'No se pudo actualizar el restaurante.'
+          );
         }
       });
   }
 
-  /** ---------------------------------------------------
-   * Deshabilitar restaurante
-   ---------------------------------------------------- */
+  /* ---------------------------------------------------
+   * DESHABILITAR
+  ---------------------------------------------------- */
   onRemove(restaurant: Restaurant) {
-    if (!restaurant.restaurantId) return;
-
     this.dialogService
       .confirmDialog({
         title: 'Dar de baja restaurante',
-        message: '¿Deseas deshabilitar este restaurante?',
+        message: '¿Deseas deshabilitarlo?',
         type: 'question',
       })
-      .subscribe(async (result) => {
-        if (result) {
-          await this.restaurantService.disableRestaurant(
-            restaurant.restaurantId
-          );
-          this.loadRestaurants();
-          this.dialogService.infoDialog('Éxito', 'Restaurante deshabilitado.');
-        }
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(async (ok) => {
+        if (!ok) return;
+        await this.restaurantService.disableRestaurant(restaurant.restaurantId);
+        this.dialogService.infoDialog('Éxito', 'Restaurante deshabilitado.');
       });
   }
 
-  /** ---------------------------------------------------
-   * Habilitar restaurante
-   ---------------------------------------------------- */
+  /* ---------------------------------------------------
+   * HABILITAR
+  ---------------------------------------------------- */
   onEnable(restaurant: Restaurant) {
-    if (!restaurant.restaurantId) return;
-
     this.dialogService
       .confirmDialog({
         title: 'Reactivar restaurante',
-        message: '¿Deseas habilitar este restaurante?',
+        message: '¿Deseas habilitarlo?',
         type: 'question',
       })
-      .subscribe(async (result) => {
-        if (result) {
-          await this.restaurantService.enableRestaurant(
-            restaurant.restaurantId
-          );
-          this.loadRestaurants();
-          this.dialogService.infoDialog('Éxito', 'Restaurante habilitado.');
-        }
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(async (ok) => {
+        if (!ok) return;
+        await this.restaurantService.enableRestaurant(restaurant.restaurantId);
+        this.dialogService.infoDialog('Éxito', 'Restaurante habilitado.');
       });
   }
 
-  /** (Extra) por compatibilidad con botones viejos */
+  /* ---------------------------------------------------
+   * Extra compatibilidad
+  ---------------------------------------------------- */
   onDisable(restaurant: Restaurant) {
-    this.restaurantService.disableRestaurant(restaurant.restaurantId!);
-    this.loadRestaurants();
+    this.restaurantService.disableRestaurant(restaurant.restaurantId);
   }
 }

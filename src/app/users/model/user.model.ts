@@ -11,7 +11,7 @@ export interface User {
   name: string;
   lastname: string;
   address?: string;
-  birthdate?: Date | null;
+  birthdate?: string | null;
   phone?: string;
   photoURL?: string;
 
@@ -35,7 +35,7 @@ export interface User {
 
   // Estado
   enabled: boolean; // Habilitado o deshabilitado
-  createdAt: Date | null; // o Timestamp si preferís
+  createdAt: string | null; // o Timestamp si preferís
 }
 
 export type UserDialogMode = 'editar-perfil' | 'editar-usuario';

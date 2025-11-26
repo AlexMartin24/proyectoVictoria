@@ -6,10 +6,17 @@ import {
   SimpleChanges,
   ViewChild,
   ChangeDetectorRef,
+  TemplateRef,
 } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { BaseTableComponent } from '../../../shared/components/base-table/base-table.component';
 import { Restaurant } from '../../model/restaurant.model';
+
+interface TableColumn {
+  id: string;
+  label: string;
+  template?: TemplateRef<any>;
+}
 
 @Component({
   selector: 'app-restaurant-list',
@@ -29,44 +36,34 @@ export class RestaurantListComponent {
   @Output() enable = new EventEmitter<Restaurant>();
   @Output() disable = new EventEmitter<Restaurant>();
 
-  @ViewChild('tplEnabled', { static: true }) tplEnabled: any;
-  @ViewChild('tplAddress', { static: true }) tplAddress: any;
-  columns: any[] = [];
+  @ViewChild('tplEnabled', { static: true }) tplEnabled!: TemplateRef<any>;
+  @ViewChild('tplAddress', { static: true }) tplAddress!: TemplateRef<any>;
 
-  /** Columnas a mostrar */
+  columns: TableColumn[] = [];
+
   ngAfterViewInit() {
-    // Construimos las columnas después de que existan los templates
     this.columns = [
       { id: 'name', label: 'Nombre' },
-      { id: 'address', label: 'Dirección', template: this.tplAddress }, // asignamos template luego
+      { id: 'address', label: 'Dirección', template: this.tplAddress },
       { id: 'phone', label: 'Teléfono' },
-      { id: 'enabled', label: 'Activo', template: this.tplEnabled }, // este tiene Sí/No
+      { id: 'enabled', label: 'Activo', template: this.tplEnabled },
     ];
 
-    // 👈 ESTA LÍNEA SOLUCIONA EL ERROR NG0100
     this.cdr.detectChanges();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    // BaseTable refresca solo con Inputs
   }
 
   onSelect(id: string) {
     this.selectRestaurant.emit(id);
   }
-
   onEdit(r: Restaurant) {
     this.edit.emit(r);
   }
-
   onRemove(r: Restaurant) {
     this.remove.emit(r);
   }
-
   onEnable(r: Restaurant) {
     this.enable.emit(r);
   }
-
   onDisable(r: Restaurant) {
     this.disable.emit(r);
   }

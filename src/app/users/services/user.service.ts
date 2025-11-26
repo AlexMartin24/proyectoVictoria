@@ -15,30 +15,26 @@ import {
 } from '@angular/fire/firestore';
 
 import { Observable } from 'rxjs';
-import { convertTimestamps } from '../../shared/helper/timestamp-converter';
 import { User } from '../model/user.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
   private usersRef: CollectionReference = collection(this.firestore, 'users');
 
   constructor(private firestore: Firestore) {}
 
-  //-------------------------------------------------------------
-  // 🟦 Helper general para escuchar cualquier query de usuarios
+  // -------------------------------------------------------------------
+  // 🔵 Helper base para escuchar queries (reduce código duplicado)
+  // -------------------------------------------------------------------
   private listenUsers(q: any): Observable<User[]> {
     return new Observable<User[]>((subscriber) => {
       const unsubscribe = onSnapshot(
         q,
         (snapshot: QuerySnapshot) => {
-          const users: User[] = snapshot.docs.map((docSnap) =>
-            convertTimestamps<User>({
-              uid: docSnap.id,
-              ...docSnap.data(),
-            })
-          );
+          const users = snapshot.docs.map((docSnap) => ({
+            uid: docSnap.id,
+            ...docSnap.data(),
+          })) as User[];
           subscriber.next(users);
         },
         (error) => subscriber.error(error)
@@ -47,18 +43,28 @@ export class UserService {
       return () => unsubscribe();
     });
   }
+  // -------------------------------------------------------------------
+  // 🟩 Crear usuario
+  // -------------------------------------------------------------------
 
-  //-------------------------------------------------------------
-  // 🟩 Crear / actualizar usuario
-  //-------------------------------------------------------------
   async createUser(user: User): Promise<void> {
     const userRef = doc(this.firestore, `users/${user.uid}`);
+
+    const now = new Date().toISOString();
+
     await setDoc(userRef, {
       ...user,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      restaurantsOwner: user.restaurantsOwner || [],
+      restaurantsStaff: user.restaurantsStaff || [],
+      enabled: true,
+      createdAt: now,
+      updatedAt: now,
     });
   }
+
+  // -------------------------------------------------------------------
+  // 🟦 Actualizar usuario
+  // -------------------------------------------------------------------
 
   async updateUser(uid: string, partialData: Partial<User>): Promise<void> {
     const userRef = doc(this.firestore, `users/${uid}`);
@@ -67,23 +73,25 @@ export class UserService {
       updatedAt: new Date().toISOString(),
     });
   }
+  // -------------------------------------------------------------------
+  // 🟧 Roles y Staff
+  // -------------------------------------------------------------------
 
-  //-------------------------------------------------------------
-  // 🧑‍🍳 Staff (agregar/quitar empleados)
-  //-------------------------------------------------------------
-async addStaffToRestaurant(userUid: string, restaurantId: string): Promise<void> {
-  const userRef = doc(this.firestore, `users/${userUid}`);
+  async addStaffToRestaurant(
+    userUid: string,
+    restaurantId: string
+  ): Promise<void> {
+    const userRef = doc(this.firestore, `users/${userUid}`);
+    await updateDoc(userRef, {
+      restaurantsStaff: arrayUnion(restaurantId),
+      enabled: true,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+  // -------------------------------------------------------------------
+  // 🟥 Deshabilitar / Habilitar empleados
+  // -------------------------------------------------------------------
 
-  await updateDoc(userRef, {
-    restaurantsStaff: arrayUnion(restaurantId),
-    enabled: true,
-    updatedAt: new Date().toISOString(),
-  });
-}
-
-  //-------------------------------------------------------------
-  // 🟥 Deshabilitar / habilitar empleado
-  //-------------------------------------------------------------
   async disableStaffMember(userUid: string): Promise<void> {
     const userRef = doc(this.firestore, `users/${userUid}`);
     await updateDoc(userRef, {
@@ -99,36 +107,34 @@ async addStaffToRestaurant(userUid: string, restaurantId: string): Promise<void>
       updatedAt: new Date().toISOString(),
     });
   }
+  // -------------------------------------------------------------------
+  // 🟦 Staff activo de un restaurante
+  // -------------------------------------------------------------------
 
-  //-------------------------------------------------------------
-  // 🟦 Obtener staff activo de un restaurante
-  //-------------------------------------------------------------
   getRestaurantStaff(restaurantId: string): Observable<User[]> {
     const q = query(
       this.usersRef,
       where('restaurantsStaff', 'array-contains', restaurantId),
       where('enabled', '==', true)
     );
-
     return this.listenUsers(q);
   }
+  // -------------------------------------------------------------------
+  // 🟫 Staff deshabilitado
+  // -------------------------------------------------------------------
 
-  //------------------------------------------------------ -------
-  // 🟫 Obtener staff deshabilitado (inactivo)
-  //-------------------------------------------------------------
   getDisabledStaff(restaurantId: string): Observable<User[]> {
     const q = query(
       this.usersRef,
       where('restaurantsStaff', 'array-contains', restaurantId),
       where('enabled', '==', false)
     );
-
     return this.listenUsers(q);
   }
+  // -------------------------------------------------------------------
+  // 🟩 Obtener un usuario por UID
+  // -------------------------------------------------------------------
 
-  //-------------------------------------------------------------
-  // 🟩 Obtener un solo usuario
-  //-------------------------------------------------------------
   getUser(uid: string): Observable<User | null> {
     return new Observable<User | null>((subscriber) => {
       const userRef: DocumentReference = doc(this.firestore, `users/${uid}`);
@@ -140,11 +146,10 @@ async addStaffToRestaurant(userUid: string, restaurantId: string): Promise<void>
             subscriber.next(null);
             return;
           }
-          const data = convertTimestamps<User>({
+          subscriber.next({
             uid: snap.id,
             ...snap.data(),
-          });
-          subscriber.next(data);
+          } as User);
         },
         (error) => subscriber.error(error)
       );

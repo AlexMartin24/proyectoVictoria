@@ -26,7 +26,7 @@ export class RestaurantDialogComponent {
   ) {
     this.mode = data.mode;
 
-    const restaurant = data.restaurant || {
+    const r = data.restaurant ?? {
       name: '',
       phone: '',
       address: '',
@@ -39,44 +39,48 @@ export class RestaurantDialogComponent {
     };
 
     this.editForm = new FormGroup({
-      name: new FormControl(restaurant.name, [
+      name: new FormControl(r.name, [
         Validators.required,
         Validators.pattern(regexAlfanumericoConEspacios),
       ]),
-      phone: new FormControl(restaurant.phone, [
+      phone: new FormControl(r.phone, [
+        Validators.required, // AGREGADO
         Validators.pattern(regexTelefono),
       ]),
-      description: new FormControl(restaurant.description, [
+      description: new FormControl(r.description, [
+        Validators.required, // AGREGADO
         Validators.pattern(regexDescripcion),
       ]),
-      address: new FormControl(restaurant.address, [
+      address: new FormControl(r.address, [
         Validators.required,
         Validators.pattern(regexDireccion),
       ]),
-      addressNumber: new FormControl(restaurant.addressNumber, [
+      addressNumber: new FormControl(r.addressNumber, [
         Validators.required,
         Validators.pattern(regexNumeros),
       ]),
-      openingHours: new FormControl(restaurant.openingHours, [
-        Validators.pattern(regexTextos),
-      ]),
-      enabled: new FormControl(restaurant.enabled),
-      imageLogo: new FormControl(restaurant.imageLogo),
-      mainImage: new FormControl(restaurant.mainImage),
+      openingHours: new FormControl(r.openingHours),
+      enabled: new FormControl(r.enabled),
+      imageLogo: new FormControl(r.imageLogo),
+      mainImage: new FormControl(r.mainImage),
     });
   }
 
   saveRestaurant() {
-    if (this.editForm.valid) {
-      let formData = this.editForm.value;
-      // Solo asigna restaurantId en modo 'edit'
-      if (this.mode === 'edit') {
-        formData.restaurantId = this.data.restaurant?.restaurantId;
-      }
-      this.dialogRef.close(formData);
-    } else {
+    if (!this.editForm.valid) {
       this.editForm.markAllAsTouched();
+      return;
     }
+
+    const formData = { ...this.editForm.value };
+
+    formData.addressNumber = Number(formData.addressNumber);
+
+    if (this.mode === 'edit') {
+      formData.restaurantId = this.data.restaurant?.restaurantId;
+    }
+
+    this.dialogRef.close(formData);
   }
 
   cancel() {

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { SharedModule } from '../../../shared/shared.module';
 import { DialogService } from '../../../core/services/dialog.service';
 import { ProductListComponent } from '../../../products/components/product-list/product-list.component';
@@ -11,7 +11,7 @@ import { ProductService } from '../../../products/services/product.service';
 import { Restaurant } from '../../model/restaurant.model';
 import { RestaurantDialogService } from '../../services/restaurant-dialog.service';
 import { RestaurantService } from '../../services/restaurant.service';
-import { StaffManagementComponent } from '../../../staff/staff-management/staff-management.component';
+import { StaffManagementComponent } from '../../staff-management/staff-management.component';
 
 @Component({
   selector: 'app-restaurant-profile',
@@ -29,6 +29,7 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
   monthlyViews = 0;
 
   private subscription?: Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -114,7 +115,7 @@ export class RestaurantProfileComponent implements OnInit, OnDestroy {
     .openProductDialog({ mode: 'edit', data: product })
     .subscribe(async (result) => {
       if (!result) return;
-      await this.productService.updateProductData(
+      await this.productService.updateProduct(
         this.restaurant.restaurantId!,
         product.productId!,
         result
